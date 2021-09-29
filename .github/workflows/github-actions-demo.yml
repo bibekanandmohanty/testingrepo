@@ -1,0 +1,15 @@
+name : Run tests
+
+on: 
+        pull_request:
+                branches:
+                        - first-pr
+
+
+jobs:
+        test:
+                runs-on: ubuntu-latest
+
+                steps:
+                - name: run the script
+                  run: bash sript.sh

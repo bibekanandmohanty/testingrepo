@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<body>
+    <script type="text/javascript" src="wizard/js/server.js"></script>
+    <div class="header bg-dark">
+        <div class="container">
+            <div class="header-inner">
+                <div class="brand-label">
+                    <span data-lang="INSTALL_HEADING"></span> <span class="storeName"></span>
+                </div>
+                <div class="brand">
+                    <figure>
+                        <img alt="logo" data-src="wizard/images/logo.png" data-src-retina="wizard/images/logo@2x.png"
+                            src="wizard/images/logo.png">
+                    </figure>
+                    <span class="ver inkVer"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div id="msform" class="dt-base theme-default">
+            <!-- Progress bar -->
+            <div class="dt-elements dt-progress-bar">
+                <ul class="progressbar-custom">
+                    <li class="step step--incomplete step--active">
+                        <div class="progress-txt">
+                            <span class="num-list">01 </span> <span data-lang="OVERVIEW">Overview</span>
+                        </div>
+                    </li>
+                    <li class="step step--incomplete step--active">
+                        <div class="progress-txt">
+                            <span class="num-list">02 </span> <span data-lang="CONFIGURATION">Configuration</span>
+                        </div>
+                    </li>
+                    <li class="step step--incomplete step--inactive">
+                        <div class="progress-txt">
+                            <span class="num-list">03 </span> <span data-lang="STORE_SETUP">Store setup</span>
+                        </div>
+                    </li>
+                    <li id="toolSetup" class="step step--incomplete step--inactive">
+                        <div class="progress-txt">
+                            <span class="num-list">04 </span> <span data-lang="TOOL_SETUP">Tool setup</span>
+                        </div>
+                    </li>
+                    <li class="step step--incomplete step--inactive">
+                        <div class="progress-txt">
+                            <span id="lastNo" class="num-list">05 </span> <span data-lang="COMPLETE">Complete</span>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Canvas Work Area -->
+            <div class="dt-elements dt-canvas">
+                <div class="canvasWrap">
+
+                    <!-- Pre-loader start -->
+                    <div class="preLoader" id="loader">
+                        <h3 class="title" data-lang="LOADING_2"></h3>
+                        <h5 class="sub-title" data-lang="LOADCONTENT_2"></h5>
+                        <div class="loader-box">
+                            <figure class="spinner">
+                                <img src="wizard/images/spinner.gif" alt="">
+                            </figure>
+                        </div>
+                    </div>
+                    <!-- Pre-loader end -->
+                    <!-- Configuration start -->
+                    <fieldset id="config" class="form-section">
+                        <ul class="list-box">
+                            <li class="list-row error" id="serverCheck1">
+                                <div class="txt-group">
+                                    <h4 class="title" data-lang="HEAD_1"></h4>
+                                    <h5 class="sub-title" data-lang="DESC_1"></h5>
+                                    <div class="settingInfo" id="serverCheck1" style="margin-left: 20px;">
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-row error" id="serverCheck2">
+                                <div class="txt-group" >
+                                    <h4 class="title" data-lang="HEAD_2"></h4>
+                                    <h5 class="sub-title" data-lang="DESC_2"></h5>
+                                    <div class="settingInfo" id="serverCheck2" style="margin-left: 20px;">
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-row error" id="serverCheck3">
+                                <div class="txt-group" >
+                                    <h4 class="title" data-lang="HEAD_3"></h4>
+                                    <h5 class="sub-title" data-lang="DESC_3"></h5>
+                                    <div class="settingInfo" id="serverCheck3" style="margin-left: 20px;">
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="list-row error" id="serverCheck4">
+                                <div class="txt-group">
+                                    <h4 class="title" data-lang="HEAD_4"></h4>
+                                    <h5 class="sub-title" data-lang="DESC_4">
+                                    </h5>
+                                    <div class="settingInfo" id="serverCheck4" style="margin-left: 20px;">
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                        <div id="alert" class="alert alert-warning" role="alert" style="margin-top: 20px;">
+                            <i class="tick-icon"></i> <strong data-lang="PAGE_WARNING"></strong> 
+                            <div class="btn btn-sm btn-dark float-right" id="retryBtn"><i class="pg pg-refresh"></i> Retry</div>
+                        </div>
+                    </fieldset>
+                    <!-- Configuration end -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            var serviceURL = getBaseURL();
+            var pkgURL = serviceURL+'getPackageInfo'; 
+            var pkgDetails = get(pkgURL);
+            var storeName = pkgDetails.data.store;
+            if(storeName == 'others'){
+                $("#toolSetup").hide();
+                $("#lastNo").html("04");
+            }
+        });
+    </script>
+</body>
+
+</html>

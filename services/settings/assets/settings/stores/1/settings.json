@@ -1,0 +1,93 @@
+{
+    "unit": "Inch",
+    "currency": {
+        "value": "$",
+        "separator": ".",
+        "post_fix": "USD",
+        "is_price_round_up": false,
+        "price_round_up_type": "lower",
+        "is_postfix_symbol": false
+    },
+    "email": "",
+    "default_tab": 0,
+    "default_tab_slug": "",
+    "advance_settings": {
+        "prompt_close_window": false,
+        "price_segregation": {
+            "is_enabled": true
+        },
+        "progress_wizard": [],
+        "social_share": false,
+        "order_artwork_status": false,
+        "maximum_gallery_size": 200
+    },
+	"appearance": {
+        "theme_color": "#f50000",
+        "custom_css": ".css%20%7Bbackdrop-filter%3A%20black%7D",
+        "theme_layouts": 1
+    },
+    "image_setting": {
+        "facebook_import": {
+            "app_id": "",
+            "domain_name": "",
+            "url": "",
+            "is_enabled": false
+        },
+        "dropbox_import": {
+            "is_enabled": false
+        },
+        "google_drive_import": {
+            "is_enabled": false
+        },
+        "file_uploaded": {
+            "width": "200",
+            "height": "200",
+            "low_resolution": true,
+            "disable_cart": true,
+            "max_file": "10",
+            "upload_tip": true,
+            "tip_message": "Please check before checkout, your image size exceeds."
+        },
+        "terms_condition": {
+            "is_enabled": true,
+            "message": "On uploading one or several images, you agree to terms on using these images. Make use of third party images or infringing somebody else's rights in unlawful.",
+            "is_default_status": true
+        }
+    },
+    "store": {
+        "color": "color",
+        "size": "size"
+    },
+    "cart": {
+        "direct_check_out": {
+            "is_enabled": true
+        },
+        "cart_terms_condition": {
+            "is_enabled": true,
+            "description": "Please make sure you are uploading high-resolution images when customizing your product. If your artwork does not follow our recommended guidelines, we cannot guarantee the quality of the final printed product. Please make sure to check your design for SPELLING, CLARITY OF THE IMAGES and TEXT PLACEMENT. What you see on the screen is what we will be printing on the product. We are not responsible for the customers supplied artwork, spelling or wrong placement of the text.",
+            "is_default_status": true
+        },
+        "order_notes": {
+            "is_enabled": true,
+            "description": "Notes are the first thing we check when we start work on your order. Tell us if you have any questions on the printing process, quality or any customization."
+        },
+        "cart_edit": {
+			"is_enabled": false,
+			"cart_item_edit_setting": "add"
+		}
+    },
+    "lanuage": {
+        "default": {
+            "name": "English",
+            "flag": "https:\/\/imprintnext.io\/xetool\/assets\/languages\/tool\/202003120651331933.png"
+        },
+        "lang_list": [
+            {
+                "name": "English",
+                "type": "tool",
+                "flag": "https:\/\/imprintnext.io\/xetool\/assets\/languages\/tool\/202003120651331933.png"
+            }
+        ],
+        "is_multi_lang": 0
+    }
+}

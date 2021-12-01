@@ -1,0 +1,530 @@
+{
+    "profile_data": {
+        "name": "Screen print",
+        "description": "Transfer any artwork on the products.\nNo minimum quantities.\nUnlimited color spectrum.",
+        "image_path": "https:\/\/dev.imprintnext.io\/magento\/xetool\/assets\/print_profile\/202003060244143853.png",
+        "thumbnail": "https:\/\/dev.imprintnext.io\/magento\/xetool\/assets\/print_profile\/thumb_202003060244143853.png"
+    },
+    "image_data": {
+        "allowed_image_format": [
+            {
+                "id": 1,
+                "name": "svg",
+                "is_disabled": 0,
+                "is_selected": 1
+            },
+            {
+                "id": 2,
+                "name": "jpeg",
+                "is_disabled": 0,
+                "is_selected": 1
+            },
+            {
+                "id": 3,
+                "name": "jpg",
+                "is_disabled": 0,
+                "is_selected": 1
+            },
+            {
+                "id": 4,
+                "name": "png",
+                "is_disabled": 0,
+                "is_selected": 1
+            },
+            {
+                "id": 5,
+                "name": "gif",
+                "is_disabled": 0,
+                "is_selected": 0
+            },
+            {
+                "id": 6,
+                "name": "bmp",
+                "is_disabled": 0,
+                "is_selected": 0
+            },
+            {
+                "id": 7,
+                "name": "pdf",
+                "is_disabled": 0,
+                "is_selected": 0
+            },
+            {
+                "id": 8,
+                "name": "ai",
+                "is_disabled": 0,
+                "is_selected": 0
+            },
+            {
+                "id": 9,
+                "name": "psd",
+                "is_disabled": 0,
+                "is_selected": 0
+            },
+            {
+                "id": 10,
+                "name": "eps",
+                "is_disabled": 0,
+                "is_selected": 0
+            },
+            {
+                "id": 11,
+                "name": "cdr",
+                "is_disabled": 0,
+                "is_selected": 0
+            },
+            {
+                "id": 12,
+                "name": "dxf",
+                "is_disabled": 0,
+                "is_selected": 0
+            },
+            {
+                "id": 13,
+                "name": "tif",
+                "is_disabled": 0,
+                "is_selected": 0
+            }
+        ],
+		"one_color_hexcode": "#ff0000",
+        "image_processing_type": "quick",
+        "is_auto_convert_image": 0,
+        "is_more_color_options": 1,
+        "color_option_value": 8,
+        "is_white_removal": 1,
+        "image_effects": {
+            "is_image_mask": 1,
+            "is_image_filter": 1
+        },
+        "show_color_option": {
+            "grey_scale": 1,
+            "one_color": 1,
+            "bw": 1,
+            "monochrome": 1
+        },
+        "auto_convert_image_type": ""
+    },
+    "color_data": {
+        "show_color_picker": 1,
+        "fill_color_code": "#000000",
+        "border_color_code": "#000000",
+        "max_colors_allowed": 9,
+        "is_max_color_allowed": 0
+    },
+    "order_data": {
+        "min_order_qty": 1,
+        "is_include_product_image": "exclude",
+        "is_horizontally_flip": 0,
+        "is_color_separation_enabled": 0,
+		"is_single_printfile_enabled": 0,
+        "is_min_order_qty": 0,
+        "is_invert_color_enabled": 0,
+        "is_bleed_mark_enabled": 0,
+        "bleed_mark": {
+            "crop_mark": 0,
+            "cut_mark": 0
+        },
+        "allowed_order_formats": [
+            {
+                "id": 14,
+                "name": "pdf",
+                "is_disabled": 0,
+                "is_selected": 1
+            },
+            {
+                "id": 15,
+                "name": "png",
+                "is_disabled": 0,
+                "is_selected": 1
+            },
+            {
+                "id": 16,
+                "name": "svg",
+                "is_disabled": 0,
+                "is_selected": 1
+            }
+        ]
+    },
+    "text_data": {
+        "do_user_upload_fonts": 1,
+        "is_text_stroke": 1,
+        "is_multiline_text": 1,
+        "do_show_graphic_fonts": 1
+    },
+    "misc_data": {
+        "allow_user_uplaod_bg": 1,
+        "clipart_options": "add",
+        "template_options": "replace",
+        "shape_options": "add"
+    },
+    "name_number_data": [],
+    "ar_data": {
+        "is_ar_enabled": 1,
+        "height": 3,
+        "width": 3
+    },
+    "sticker": {
+        "is_sticker_enabled": 0,
+        "shapes": {
+            "is_selected": 0,
+            "option_list": [
+                {
+                    "id": 1,
+                    "name": "Basic shapes",
+                    "options": [
+                        {
+                        "id": 1,
+                        "name": "Circle",
+                        "is_selected": 0
+                        },
+                        {
+                        "id": 2,
+                        "name": "Rectangle",
+                        "is_selected": 0
+                        },
+                        {
+                        "id": 3,
+                        "name": "Heart",
+                        "is_selected": 0
+                        },
+                        {
+                        "id": 4,
+                        "name": "Star",
+                        "is_selected": 0
+                        },
+                        {
+                        "id": 5,
+                        "name": "Round corner",
+                        "is_selected": 0
+                        }
+                    ]
+                },
+                {
+                    "id": 2,
+                    "name": "Diecut shapes",
+                    "options": [
+                        {
+                        "id": 6,
+                        "name": "Small",
+                        "value": 0,
+                        "is_selected": 0
+                        },
+                        {
+                        "id": 7,
+                        "name": "Medium",
+                        "value": 0,
+                        "is_selected": 0
+                        },
+                        {
+                        "id": 8,
+                        "name": "Large",
+                        "value": 0,
+                        "is_selected": 0
+                        }
+                    ]
+                }
+            ]
+        },
+        "material": {
+            "is_selected": 0,
+            "option_list": [
+                {
+                    "id": 1,
+                    "name": "Holographic",
+                    "is_selected": 0,
+                    "file_name": "https://dev.imprintnext.io/staging/xetool/assets/stickers/holographic.png"
+                },
+                {
+                    "id": 2,
+                    "name": "Mirror",
+                    "is_selected": 0,
+                    "file_name": "https://dev.imprintnext.io/staging/xetool/assets/stickers/mirror.png"
+                },
+                {
+                    "id": 3,
+                    "name": "Glitter",
+                    "is_selected": 0,
+                    "file_name": "https://dev.imprintnext.io/staging/xetool/assets/stickers/glitter.png"
+                },
+                {
+                    "id": 4,
+                    "name": "Matte",
+                    "is_selected": 0,
+                    "file_name": "https://dev.imprintnext.io/staging/xetool/assets/stickers/matte.png"
+                },
+                {
+                    "id": 5,
+                    "name": "Transparent",
+                    "is_selected": 0,
+                    "file_name": "https://dev.imprintnext.io/staging/xetool/assets/stickers/transparent.png"
+                },
+                {
+                    "id": 6,
+                    "name": "Prismatic",
+                    "is_selected": 0,
+                    "file_name": "https://dev.imprintnext.io/staging/xetool/assets/stickers/prismatic.png"
+                },
+                {
+                    "id": 7,
+                    "name": "Kraft paper",
+                    "is_selected": 0,
+                    "file_name": "https://dev.imprintnext.io/staging/xetool/assets/stickers/kraft_paper.png"
+                }
+            ]
+        }
+    },
+	"language_data": [	
+        {	
+            "lang_name": "English",	
+            "lang_id": 1,	
+            "lang_data": {	
+                "title": "Screen Print",	
+                "description": "Transfer any artwork on the products.\\nNo minimum quantities.\nUnlimited color spectrum."	
+            }	
+        }	
+    ],	
+    "embroidery": {	
+        "is_embroidery_enabled": 0	
+    },
+    "vdp_data": {
+        "is_enabled": 0,
+        "vdp": 0
+    },
+    "feature_data": [
+        {
+            "id": 1,
+            "name": "Clipart library",
+            "slug": "clipart",
+            "asset_type_id": 2,
+            "is_selected": 1
+        },
+        {
+            "id": 2,
+            "name": "Use from Templates",
+            "slug": "template",
+            "asset_type_id": 11,
+            "is_selected": 1
+        },
+        {
+            "id": 3,
+            "name": "Backgrounds",
+            "slug": "background",
+            "asset_type_id": 1,
+            "is_selected": 1
+        },
+        {
+            "id": 4,
+            "name": "Draw with your hand",
+            "slug": "drawing",
+            "asset_type_id": 0,
+            "is_selected": 0
+        },
+        {
+            "id": 5,
+            "name": "Shapes library",
+            "slug": "shape",
+            "asset_type_id": 9,
+            "is_selected": 1
+        },
+        {
+            "id": 6,
+            "name": "Upload design",
+            "slug": "image",
+            "asset_type_id": 0,
+            "is_selected": 1
+        },
+        {
+            "id": 7,
+            "name": "Add Text",
+            "slug": "text",
+            "asset_type_id": 0,
+            "is_selected": 1
+        },
+        {
+            "id": 8,
+            "name": "Team Jearsy",
+            "slug": "team",
+            "asset_type_id": 0,
+            "is_selected": 0
+        },
+        {
+            "id": 9,
+            "name": "VDP",
+            "slug": "vdp",
+            "asset_type_id": 0,
+            "is_selected": 0
+        },
+        {
+            "id": 10,
+            "name": "AR",
+            "slug": "ar",
+            "asset_type_id": 0,
+            "is_selected": 0
+        },
+        {
+            "id": 11,
+            "name": "Gallery",
+            "slug": "gallery",
+            "asset_type_id": 0,
+            "is_selected": 0
+        }
+    ],
+    "engrave": {
+        "engrave_surface_list": [
+            {
+                "id": 1,
+                "is_selected": 1,
+                "surface_name": "Wooden",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 2,
+                "is_selected": 0,
+                "surface_name": "Metal",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 3,
+                "is_selected": 0,
+                "surface_name": "Frost Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 4,
+                "is_selected": 0,
+                "surface_name": "Gold Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 5,
+                "is_selected": 0,
+                "surface_name": "Silver Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 6,
+                "is_selected": 0,
+                "surface_name": "Brown Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 7,
+                "is_selected": 0,
+                "surface_name": "Blue Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 8,
+                "is_selected": 0,
+                "surface_name": "Green Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 9,
+                "is_selected": 0,
+                "surface_name": "Evergreen Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 10,
+                "is_selected": 0,
+                "surface_name": "Red Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            },
+            {
+                "id": 11,
+                "is_selected": 0,
+                "surface_name": "Black Laser",
+                "shadow_direction": null,
+                "shadow_size": null,
+                "shadow_opacity": null,
+                "shadow_strength": null,
+                "shadow_blur": null,
+                "is_user_defined": 0
+            }
+        ],
+        "auto_convert_list": [
+            {
+                "id": 1,
+                "name": "BW",
+                "is_selected": 1
+            },
+            {
+                "id": 2,
+                "name": "Grayscale",
+                "is_selected": 0
+            }
+        ],
+        "is_laser_engrave_enabled": 0,
+        "is_auto_convert_enabled": 0,
+        "is_engraved_surface": 0,
+		"is_hide_color_options": 0,
+        "is_engrave_image": 0,
+        "engrave_image_path": null,
+        "engrave_image_path_thumbnail": null,
+        "engrave_color_code": null,
+        "is_engrave_preview_image": 0,
+        "engrave_preview_image_path": null,
+        "engrave_preview_image_path_thumbnail": null,
+        "engrave_preview_color_code": null
+    },
+    "font_data": {
+        "id": 26,
+        "name": "akaPosse",
+        "price": "0.00",
+        "font_family": "akaPosse",
+        "file_name": "https:\/\/dev.imprintnext.io\/magento\/xetool\/assets\/fonts\/202003310925011161.ttf"
+    },
+    "is_inkscape_enabled": 0,
+    "print_profile_pricing": {}
+}

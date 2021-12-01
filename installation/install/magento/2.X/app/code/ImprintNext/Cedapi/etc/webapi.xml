@@ -1,0 +1,313 @@
+<?xml version="1.0"?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../app/code/Magento/Webapi/etc/webapi.xsd">
+
+<!-- Product Section Start -->
+<route url="/V1/product/getProducts" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getProducts"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getProductById" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getProductById"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getCategories" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getCategories"/>
+	<resources>
+		<resource ref="Magento_Catalog::categories"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getColorVariantsByProduct" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getColorVariantsByProduct"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getAllVariantsByProduct" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getAllVariantsByProduct"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getAttributes" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getAttributes"/>
+	<resources>
+		<resource ref="Magento_Catalog::attributes_attributes"/>
+	</resources>
+</route>
+
+<route url="/V1/product/checkDuplicateNameAndSku" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="checkDuplicateNameAndSku"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/createPredecoSimpleProduct" method="POST">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="createPredecoSimpleProduct"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/createPredecoConfigProduct" method="POST">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="createPredecoConfigProduct"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/totalProductCount" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="totalProductCount"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getSizeAndQuantity" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getSizeAndQuantity"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getColorArr" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getColorArr"/>
+	<resources>
+		<resource ref="Magento_Catalog::attributes_attributes"/>
+	</resources>
+</route>
+
+<route url="/V1/product/addColorOption" method="POST">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="addColorOption"/>
+	<resources>
+		<resource ref="Magento_Catalog::attributes_attributes"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getAllProductByCategory" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getAllProductByCategory"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getMultiAttributeVariantDetails" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getMultiAttributeVariantDetails"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getAttributesByProductId" method="GET">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getAttributesByProductId"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/addCatalogProductToStore" method="POST">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="addCatalogProductToStore"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getAllStores" method="POST">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getAllStores"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/createStoreProductCatagories" method="POST">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="createStoreProductCatagories"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/removeStoreProductCatagories" method="POST">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="removeStoreProductCatagories"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+
+<route url="/V1/product/getVariants" method="POST">
+	<service class="ImprintNext\Cedapi\Api\ProductInterface" method="getVariants"/>
+	<resources>
+		<resource ref="Magento_Catalog::products"/>
+	</resources>
+</route>
+<!-- Product Section End -->
+
+<!-- Cart Section Start -->
+<route url="/V1/cart/addToCart" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CartInterface" method="addToCart"/>
+	<resources>
+		<resource ref="Magento_Cart::manage"/>
+	</resources>
+</route>
+
+<route url="/V1/cart/getTotalCartItem" method="GET">
+	<service class="ImprintNext\Cedapi\Api\CartInterface" method="getTotalCartItem"/>
+	<resources>
+		<resource ref="Magento_Cart::manage"/>
+	</resources>
+</route>
+
+<route url="/V1/cart/removeCartItem" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CartInterface" method="removeCartItem"/>
+	<resources>
+		<resource ref="Magento_Cart::manage"/>
+	</resources>
+</route>
+<!-- Cart Section End -->
+
+<!-- Customer Section Start -->
+<route url="/V1/customer/getStoreCustomers" method="GET">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="getStoreCustomers"/>
+	<resources>
+		<resource ref="Magento_Customer::customer"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/getStoreCustomerDetails" method="GET">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="getStoreCustomerDetails"/>
+	<resources>
+		<resource ref="Magento_Customer::customer"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/getTotalCustomerCount" method="GET">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="getTotalCustomerCount"/>
+	<resources>
+		<resource ref="Magento_Customer::customer"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/getAllCountries" method="GET">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="getAllCountries"/>
+	<resources>
+		<resource ref="Magento_Customer::customer"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/getAllStatesByCode" method="GET">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="getAllStatesByCode"/>
+	<resources>
+		<resource ref="Magento_Customer::customer"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/createCustomer" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="createCustomer"/>
+	<resources>
+		<resource ref="Magento_Customer::customer"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/createShippingAddress" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="createShippingAddress"/>
+	<resources>
+		<resource ref="Magento_Customer::customer"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/updateShippingAddress" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="updateShippingAddress"/>
+	<resources>
+		<resource ref="Magento_Customer::customer"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/deleteCustomer" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="deleteCustomer"/>
+	<resources>
+		<resource ref="Magento_Customer::manage"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/getStoreCustomerDetailsWithShipId" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="getStoreCustomerDetailsWithShipId"/>
+	<resources>
+		<resource ref="Magento_Customer::manage"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/getStoreCustomerCount" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="getStoreCustomerCount"/>
+	<resources>
+		<resource ref="Magento_Customer::manage"/>
+	</resources>
+</route>
+
+<route url="/V1/customer/getStoreCustomersId" method="POST">
+	<service class="ImprintNext\Cedapi\Api\CustomerInterface" method="getStoreCustomersId"/>
+	<resources>
+		<resource ref="Magento_Customer::manage"/>
+	</resources>
+</route>
+<!-- Customer Section End -->
+
+<!-- Order Section Start -->
+<route url="/V1/cart/getOrders" method="GET">
+	<service class="ImprintNext\Cedapi\Api\OrderInterface" method="getOrders"/>
+	<resources>
+		<resource ref="Magento_Sales::sales"/>
+	</resources>
+</route>
+
+<route url="/V1/cart/getOrderDetails" method="GET">
+	<service class="ImprintNext\Cedapi\Api\OrderInterface" method="getOrderDetails"/>
+	<resources>
+		<resource ref="Magento_Sales::sales"/>
+	</resources>
+</route>
+
+<route url="/V1/cart/getOrderlogByOrderId" method="GET">
+	<service class="ImprintNext\Cedapi\Api\OrderInterface" method="getOrderlogByOrderId"/>
+	<resources>
+		<resource ref="Magento_Sales::sales"/>
+	</resources>
+</route>
+
+<route url="/V1/cart/getAllOrderStatuses" method="GET">
+	<service class="ImprintNext\Cedapi\Api\OrderInterface" method="getAllOrderStatuses"/>
+	<resources>
+		<resource ref="Magento_Sales::sales"/>
+	</resources>
+</route>
+
+<route url="/V1/cart/updateOrderStatusByOrderId" method="POST">
+	<service class="ImprintNext\Cedapi\Api\OrderInterface" method="updateOrderStatusByOrderId"/>
+	<resources>
+		<resource ref="Magento_Sales::sales"/>
+	</resources>
+</route>
+
+<route url="/V1/cart/placeOrderFromQuotation" method="POST">
+	<service class="ImprintNext\Cedapi\Api\OrderInterface" method="placeOrderFromQuotation"/>
+	<resources>
+		<resource ref="Magento_Sales::sales"/>
+	</resources>
+</route>
+
+<route url="/V1/cart/getOrderLineItemDetails" method="POST">
+	<service class="ImprintNext\Cedapi\Api\OrderInterface" method="getOrderLineItemDetails"/>
+	<resources>
+		<resource ref="Magento_Sales::sales"/>
+	</resources>
+</route>
+<!-- Order Section End -->
+
+</routes>

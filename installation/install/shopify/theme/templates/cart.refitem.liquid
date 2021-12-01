@@ -1,0 +1,15 @@
+<div id="info" style="text-align: center;font-size: x-large; padding-top: 10%;">
+  <span style="width:100%;display: block;"> Redirecting.. Please wait while your cart loads...this may take a moment</span>
+  <img src="{{ '1494.gif' | asset_img_url: '300x' }}" class="center">
+</div>
+
+
+
+
+<script>
+  $(document).ready(function() {	
+    $(".loading").html('Redirecting.. Please wait while your cart loads...this may take a moment');
+	  addItem();   
+  });
+  
+</script>

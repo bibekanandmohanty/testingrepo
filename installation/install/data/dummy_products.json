@@ -1,0 +1,28 @@
+{
+	"status": 1,
+	"records": 5,
+	"total_records": 5,
+	"data": [
+		{
+			"id": 9214,
+			"variant_id": 9229,
+			"name": "Men Tshirt",
+			"type": "variable",
+			"sku": "",
+			"price": 11.99,
+			"image": [
+				"https://imprintnext.io/xetool/assets/products/202003110151317524.png",
+				"https://imprintnext.io/xetool/assets/products/202003110151317272.png",
+				"https://imprintnext.io/xetool/assets/products/202003111001399885.png",
+				"https://imprintnext.io/xetool/assets/products/202003111001398397.png"
+			],
+			"is_decoration_exists": 1,
+			"print_profile": [
+				{
+					"id": 1,
+					"name": "DTG"
+				}
+			]
+		}
+	]
+}

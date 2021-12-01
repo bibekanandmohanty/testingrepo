@@ -1,0 +1,8 @@
+/vendor/
+/logs/*
+!/logs/README.md
+/.vscode
+/uploads/
+/app/Modules/Products
+
+/composer.lock

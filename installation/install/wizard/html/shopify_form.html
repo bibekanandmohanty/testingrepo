@@ -1,0 +1,34 @@
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="SHOP_NAME"></label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control form-control-lg" autocomplete="off" name="shop" id="" value="" onkeypress="return blockSpace(event)">
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="SHOP_USER"></label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control form-control-lg" autocomplete="off" name="apiuser" id="" value="" onkeypress="return blockSpace(event)">
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="SHOP_PWD"></label>
+    <div class="col-sm-6">
+        <input type="password" class="form-control form-control-lg" autocomplete="off" name="apipass" id="" value="" onkeypress="return blockSpace(event)">
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="SHOP_SECRET"></label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control form-control-lg" autocomplete="off" name="secretkey" id="" value="" onkeypress="return blockSpace(event)">
+    </div>
+</div>
+<div id="message" class="alert alert-warning d-none" role="alert" style="margin-top: 20px;">
+<i class="tick-icon"></i> <strong id="errorMSG"></strong>
+</div>
+<input type="button" name="next" data-lang="PROCEED_BUTTON_3_2" class="btn btn-lg btn-success next action-button mt-3"
+    value="" onclick="setStoreCred();">
+<script type="text/javascript">
+    $(document).ready(function() {
+        updateLanguage();
+ });
+</script>

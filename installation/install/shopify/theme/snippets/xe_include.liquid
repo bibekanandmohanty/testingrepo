@@ -1,0 +1,8 @@
+ {{ 'xe_cart.min.js' | asset_url | script_tag }}
+  {{ 'xe_app.js' | asset_url | script_tag }}
+  {{ 'xe_cart_image.css' | asset_url | stylesheet_tag }}
+  <script type="text/javascript">
+            jQuery(function() {
+               CartJS.init({{ cart | json }}); 
+ 	});
+  </script>

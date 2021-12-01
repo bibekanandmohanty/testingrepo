@@ -1,0 +1,8 @@
+.cart_product img {
+    margin-right: 5px;
+}
+
+#cart_summary tbody td.cart_product {
+    width: auto!important;
+    text-align: left;
+}

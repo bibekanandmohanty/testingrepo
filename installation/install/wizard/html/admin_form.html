@@ -1,0 +1,73 @@
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="ADMIN_USER"></label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control form-control-lg" name="adminUser" id="" value="" onkeypress="return blockSpace(event)">
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="inputPassword" class="col-sm-3 col-form-label col-form-label-lg" data-lang="ADMIN_PWD"></label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control form-control-lg" name="password" id="" value="" onkeypress="return blockSpace(event)">
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="inputPassword" class="col-sm-3 col-form-label col-form-label-lg" data-lang="CNFRM_PWD"></label>
+    <div class="col-sm-6">
+        <input type="password" class="form-control form-control-lg" name="adminPassword" id="" value="" onkeypress="return blockSpace(event)">
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="SEC_Q1"></label>
+    <div class="col-sm-6">
+        <select class="custom-select custom-select-lg question" id="question1"></select>
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="SEC_A"></label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control form-control-lg" name="securAns1" id="" value="">
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="SEC_Q2"></label>
+    <div class="col-sm-6">
+        <select class="custom-select custom-select-lg question" id="question2"></select>
+    </div>
+</div>
+<div class="form-group mb-4 row">
+    <label for="staticEmail" class="col-sm-3 col-form-label col-form-label-lg" data-lang="SEC_A"></label>
+    <div class="col-sm-6">
+        <input type="text" class="form-control form-control-lg" name="securAns2" id="" value="">
+    </div>
+</div>
+<div id="message" class="alert alert-warning d-none" role="alert" style="margin-top: 20px;">
+<i class="tick-icon"></i> <strong id="errorMSG"></strong>
+</div>
+<input type="button" name="next" data-lang="PROCEED_BUTTON_3_3" class="btn btn-lg btn-success next action-button mt-5"
+    value="" onclick="createAdmin();">
+<script type="text/javascript">
+    function prepareQuestionList(questions){
+        $('.question').append($("<option></option>").attr("value",'').text('select question'));
+        $(questions).each(function(key, val) {
+            console.log(val.question);
+            $('.question').append($("<option></option>").attr("value",val.id).text(val.question));
+        });
+    }
+    $(document).ready(function() {
+        var serviceURL = getBaseURL();
+        var questions = get(serviceURL+'getSecurityQuestions');
+        prepareQuestionList(questions.questions);
+        updateLanguage();
+
+        var question1 = select = document.getElementById( 'question1' );
+        var question2 = select = document.getElementById( 'question2' );
+
+        question1.onchange = function() {
+            preventDupes.call(this, question2, this.selectedIndex );
+        };
+
+        question2.onchange = function() {
+            preventDupes.call(this, question1, this.selectedIndex );
+        };
+ });
+</script>

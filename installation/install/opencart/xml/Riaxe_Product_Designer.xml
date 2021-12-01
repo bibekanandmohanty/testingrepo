@@ -1,0 +1,1041 @@
+<modification>
+	<id><![CDATA[Product Designer]]></id>
+	<name>Product Designer for OpenCart</name>
+	<version>3.0.0.0</version>
+	<vqmver>2.6.2</vqmver>
+	<link>http://riaxe.com</link>
+	<code>fpd-v20x</code>
+	<author>Riaxe Systems</author>
+	<file path="admin/view/template/catalog/product_form.twig">
+		<operation>
+			<search position="after"><![CDATA[<div class="tab-pane" id="tab-links">]]></search>
+			<add><![CDATA[<div class="form-group">
+                <label class="col-sm-2 control-label">{{ entry_variant }}</label>
+                <div class="col-sm-10">
+                  <label class="radio-inline">{% if product_variant %} 
+                    <input type="radio" name="product_variant" value="1" checked="checked" />
+					{{ text_yes }}
+					{% else %}
+                    <input type="radio" name="product_variant" value="1" />
+					{{ text_yes }}
+					{% endif %}</label>
+                  <label class="radio-inline">{% if not product_variant %} 
+                    <input type="radio" name="product_variant" value="0" checked="checked" />
+					{{ text_no }}
+					{% else %}
+                    <input type="radio" name="product_variant" value="0" />
+					{{ text_no }}
+					{% endif %}</label>
+                </div>
+              </div>
+			  <div class="form-group">
+                <label class="col-sm-2 control-label" for="input-parent"><span data-toggle="tooltip" title="{{ help_parent }}">{{ entry_parent }}</span></label>
+                <div class="col-sm-10">
+                  <input type="text" name="parent" placeholder="{{ entry_parent }}" id="input-parent" class="form-control" value="{{ parent }}" />
+				  <input type="hidden" name="parent_id" id="parent_id" value="{{ parent_id }}" />
+                </div>
+              </div>]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$('#product-related').delegate('.fa-minus-circle', 'click', function() {]]></search>
+			<add><![CDATA[	 // Parent
+				$('input[name=\'parent\']').autocomplete({
+					'source': function(request, response) {
+						$.ajax({
+							url: 'index.php?route=catalog/product/autocomplete&user_token={{ user_token }}&depth=0`&filter_name=' +  encodeURIComponent(request),
+							dataType: 'json',
+							success: function(json) {
+								console.log(json);
+								response($.map(json, function(item) {
+									return {
+										label: item['name'],
+										value: item['product_id']
+									}
+								}));
+							}
+						});
+					},
+					'select': function(item) {
+						$('#input-parent').val(item['label']);
+
+						$('#parent_id').val(item['value']);
+					}
+				});]]></add>
+		</operation>
+	</file>
+	<file path="admin/model/catalog/product.php">
+		<operation>
+			<search position="after"><![CDATA[$product_id = $this->db->getLastId();]]></search>
+			<add><![CDATA[        if (isset($data['product_variant']) && $data['product_variant']==1) {
+			$this->db->query("INSERT INTO `" . DB_PREFIX . "product_variant` SET `product_id` = " . (int)$product_id . ", variant_id = " . (int)$data['parent_id']);
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[public function editProduct($product_id, $data) {]]></search>
+			<add><![CDATA[        $this->db->query("DELETE FROM `" . DB_PREFIX . "product_variant` WHERE product_id = " . (int)$product_id);
+
+		if (isset($data['product_variant']) && $data['product_variant'] == 1) {
+			$this->db->query("INSERT INTO `" . DB_PREFIX . "product_variant` SET `product_id` = " . (int)$product_id . ", variant_id = " . (int)$data['parent_id']);
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[ sort_order = '" . (int)$data['sort_order'] . "']]></search>
+			<add><![CDATA[ sort_order = '" . (int)$data['sort_order'] . "', is_variant= '" . (int)$data['product_variant'] . "']]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[public function deleteProduct($product_id) {]]></search>
+			<add><![CDATA[        $variants = $this->getVariantList($product_id);
+		if (!empty($variants)) {			
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_description WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_filter WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_option WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE related_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_special WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "review WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring WHERE product_id = " . (int)$product_id);
+
+			$this->cache->delete('product');
+			foreach ($variants as $data) {
+				$product_id = $data['product_id'];
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_description WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_filter WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_option WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE related_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_special WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "review WHERE product_id = '" . (int)$product_id . "'");
+				$this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring WHERE product_id = " . (int)$product_id);
+			}
+		} else {
+
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_attribute WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_description WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_discount WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_filter WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_image WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_option WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_option_value WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_related WHERE related_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_reward WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_special WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_category WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_download WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_layout WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_to_store WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "review WHERE product_id = '" . (int)$product_id . "'");
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_recurring WHERE product_id = " . (int)$product_id);
+			$this->db->query("DELETE FROM " . DB_PREFIX . "product_variant WHERE product_id='" . (int)$product_id . "'");
+			$this->cache->delete('product');
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$sql .= " GROUP BY p.product_id";]]></search>
+			<add><![CDATA[        if (!empty($data['depth'])) {
+			$sql .= " AND p.is_variant = '" . (int)$data['depth'] . "'";
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[public function getTotalProductsByLayoutId($layout_id) {]]></search>
+			<add><![CDATA[    public function getProductVariant($product_id) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_variant pv LEFT JOIN " . DB_PREFIX . "product_description pd ON (pv.variant_id = pd.product_id) WHERE pv.product_id = '" . (int)$product_id . "'");
+
+		return $query->rows;
+	}
+
+	public function getVariantList($product_id) {
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_variant WHERE variant_id = '" . (int)$product_id . "'");
+		return $query->rows;
+	}]]></add>
+		</operation>
+	</file>
+	<file path="admin/controller/catalog/product.php">
+		<operation>
+			<search position="after"><![CDATA[$data['header'] = $this->load->controller('common/header');]]></search>
+			<add><![CDATA[$data['entry_variant'] = $this->language->get('entry_variant');
+			$data['entry_parent'] = $this->language->get('entry_parent');]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$data['user_token'] = $this->session->data['user_token'];]]></search>
+			<add><![CDATA[$data['help_parent'] = $this->language->get('help_parent');]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$this->load->model('catalog/recurring');]]></search>
+			<add><![CDATA[        if (isset($this->request->post['product_variant'])) {
+			$data['product_variant'] = $this->request->post['product_variant'];
+		} elseif (!empty($product_info)) {
+			$data['product_variant'] = isset($product_info['is_variant']) ? $product_info['is_variant'] : 0;
+		} else {
+			$data['product_variant'] = 0;
+		}
+
+		if (isset($this->request->post['parent'])) {
+			$data['parent'] = $this->request->post['parent'];
+			$data['parent_id'] = $this->request->post['parent_id'];
+		} elseif (isset($this->request->get['product_id'])) {
+			$data['variant_details'] = $this->model_catalog_product->getProductVariant($this->request->get['product_id']);
+			if (!empty($data['variant_details'])) {
+				$data['parent'] = $data['variant_details'][0]['name'];
+				$data['parent_id'] = $data['variant_details'][0]['variant_id'];
+			} else {
+				$data['parent'] = '';
+				$data['parent_id'] = '';
+			}
+		} else {
+			$data['parent'] = '';
+			$data['parent_id'] = '';
+		}]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[if (isset($this->request->get['limit'])) {]]></search>
+			<add><![CDATA[if (isset($this->request->get['depth'])) {
+				$depth = $this->request->get['depth'];
+			} else {
+				$depth = '';
+			}]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA['start'        => 0,]]></search>
+			<add><![CDATA['depth'        => $depth,]]>
+			</add>
+		</operation>
+		
+	</file>
+	<file path="admin/language/en-gb/catalog/product.php">
+		<operation>
+			<search position="before"><![CDATA[$_['entry_recurring']        = 'Recurring Profile';]]></search>
+			<add><![CDATA[$_['entry_variant']        = 'Is a Variant';
+			$_['entry_parent']        = 'Parent Product';]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$_['help_tag']               = 'Comma separated';]]></search>
+			<add><![CDATA[$_['help_parent']          	 = '(Autocomplete)';]]>
+			</add>
+		</operation>
+	</file>
+	
+	<file path="catalog/controller/product/product.php">
+		<operation>
+			<search position="before"><![CDATA[if ($product_info) {]]></search>
+			<add><![CDATA[$catagory_info = $this->model_catalog_product->getCategories($product_id);
+				$catIds = [];
+				foreach ($catagory_info as $key => $value) {
+					$catIds[$key] = $value['category_id'];
+				}
+				$catIds = implode(',', $catIds);]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$data['description'] = html_entity_decode($product_info['description'], ENT_QUOTES, 'UTF-8');]]></search>
+			<add><![CDATA[$data['root_url'] = $this->config->get('config_url'); 
+				$data['root_ssl'] = $this->config->get('config_ssl');
+				$data['store_id'] = (int)$this->config->get('config_store_id');
+				$this->load->model('setting/setting');
+				$impr_dir = $this->model_setting_setting->getSettingValue('imprintnext_default_directory', $data['store_id']);
+				if($impr_dir)
+					$impr_dir = $impr_dir;
+				else 
+					$impr_dir = "designer";
+				$data['imprintnext_dir'] = $impr_dir;
+				$data['category_ids'] = $catIds;
+				]]>
+			</add>
+		</operation>
+	</file>
+
+	<file path="catalog/model/catalog/product.php">
+		<operation>
+			<search position="replace"><![CDATA[$sql .= " GROUP BY p.product_id";]]></search>
+			<add><![CDATA[$sql .= " AND p.is_variant = '0' GROUP BY p.product_id";]]>
+			</add>
+		</operation>
+	</file>
+	<file path="catalog/view/theme/*/template/product/product.twig">
+		<operation>
+			<search position="replace"><![CDATA[<select name="option[{{ option.product_option_id }}]" id="input-option{{ option.product_option_id }}" class="form-control">]]>
+			</search>
+			<add><![CDATA[<select name="option[{{ option.product_option_id }}]" id="input-option{{ option.product_option_id }}" class="form-control selectOption">]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[{% for option in options %}]]></search>
+			<add><![CDATA[ {% set option_name = '' %}
+			{% if option.name == 'xe_color' %} {% set option_name='color' %}{% endif %} {% if option.name == 'xe_size'%} {% set option_name='Size' %}{% endif %} {% if option.name == 'xe_is_design' %} {% set customize = option.value %} {% set style = "style='display:none'" %} {% endif %} {% if option.name == 'disable_addtocart' %} {% set disable_cart = option.value %} {% set style_cartBtn = "style='display:none'" %} {% endif %} {% if option.name == 'refid' %} {% set refid = option.value %} {% set style = "style='display:none'" %} {% endif %}]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[{% for option in options %}]]></search>
+			<add><![CDATA[{% set optionStyle = '' %}
+			{% for option in options %} {% if option.name == 'disable_addtocart' and option.value == 1 %}{% set optionStyle = "style='display:none'" %}  {% endif %} {% endfor %}
+			{% set customize = '' %}
+			{% set refid = 0 %}
+			{% set style_cartBtn = '' %}
+			{% set style = '' %}
+			{% set disable_cart = '' %}]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[<button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn btn-primary btn-lg btn-block">{{ button_cart }}</button>]]></search>
+			<add><![CDATA[<button type="button" id="button-cart" data-loading-text="{{ text_loading }}" class="btn btn-primary btn-lg btn-block" 
+			{% if disable_cart is defined and disable_cart ==1%} {{ style_cartBtn ~' '~ style }} {% endif %}>{{ button_cart }}</button>]]></add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[{% if minimum > 1 %}]]></search>
+			<add><![CDATA[{% if customize is defined and customize == 1 %} <button type="button" id="button-customize" data-loading-text="{{ text_loading }}" class="btn btn-primary btn-lg btn-block" disabled>Customize</button> {% endif%}]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[{% if option.type == 'text' %}]]></search>
+			<add><![CDATA[{% if option.type == 'text' and option.name == 'xe_color' %} <div {{ style is defined ? style:'' }} > ]]>
+			</add>
+		</operation>
+			<operation>
+				<search position="replace" index="1"><![CDATA[<label class="control-label" for="input-option{{ option.product_option_id }}">{{ option.name }}</label>]]></search>
+				<add><![CDATA[<label class="control-label" for="input-option{{ option.product_option_id }}" id="input-option{{ option.product_option_id }}">{% if option_name is not null and option_name is not empty %} {{ option_name }} {% else %} {{ option.name }} {% endif %}</label>]]>
+				</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[{% if option.type == 'select' %}]]></search>
+			<add><![CDATA[<div {{ optionStyle is defined ? optionStyle :'' }} >]]>
+			</add>
+		</operation>
+		<operation>			
+			<search position="after"><![CDATA[</select>]]></search>
+			<add><![CDATA[</div>]]></add>
+		</operation>
+		<operation>			
+			<search position="before"><![CDATA[<select name="recurring_id" class="form-control">]]></search>
+			<add><![CDATA[<div>]]></add>
+		</operation>
+		<operation>			
+			<search position="after"><![CDATA[<input type="text" name="option[{{ option.product_option_id }}]" value="{{ option.value }}" placeholder="{{ option.name }}" id="input-option{{ option.product_option_id }}" class="form-control" />]]></search>			
+			<add><![CDATA[</div>]]></add>		
+		</operation>
+
+		<operation>
+			<search position="after"><![CDATA[{{ footer }}]]></search>
+			<add><![CDATA[<script type="text/javascript">
+				var productVariantId = 0; 
+			jQuery(document).ready(function(){
+
+			var countOption = 0;
+			jQuery(".selectOption").each(function () {
+            	countOption++;
+        	});
+        	if(countOption<1){
+        		var productid={{ product_id }};	var refid = {{ (refid is defined and refid !='')?refid:0 }};
+        		var catids = '{{ category_ids }}';
+				var imrdir = '{{ imprintnext_dir }}';
+				var root_url, store_id; 
+				store_id = {{ store_id }};
+				if (location.protocol == 'http:')
+					root_url = '{{ root_url}}';//HTTP_SERVER
+				else
+					root_url = '{{ root_ssl }}';//HTTPS_SERVER
+
+				var qty = jQuery("input[name=quantity]").val();
+				if(refid){
+					var url = root_url+imrdir+"/index.html?id={{ product_id }}&vid={{ product_id }}&qty="+qty+"&store="+store_id+"&dpid="+refid;	
+				} else {
+					var url = root_url+imrdir+"/index.html?id={{ product_id }}&vid={{ product_id }}&qty="+qty+"&store="+store_id;	
+				}
+				jQuery("#button-customize").attr("rel",url);
+        		jQuery("#button-customize").attr('disabled', false);
+        		var ApiTemProUrl = root_url+imrdir+"/api/v1/template-products";
+				jQuery.get(ApiTemProUrl + "?prodcatID="+catids, function(responseData) {
+					if(responseData.is_enabled){
+				       var pbti = 1;
+					}else{
+						var pbti = 0;
+					}
+					var url = jQuery("#button-customize").attr("rel");
+					url = url+"&pbti="+pbti;
+					jQuery("#button-customize").attr("rel",url);
+	    		},'json');
+        		jQuery("#button-customize").click(function(){
+					location.href = jQuery("#button-customize").attr("rel");					
+				});
+        	}
+        	
+        	var noOfOption = 0;
+        	var optionArr = [];
+			var colorOptionValueId = 0;
+			var sizeOptionValueId = 0;
+			var enableCustomize = 0;
+			jQuery(".selectOption").change(function() {
+				var id = jQuery(this).attr('id');
+				var optionValueStr = getData(id);
+				var optionValue = jQuery(this).val();
+		        if(optionValue != ''){
+		        	if(optionValueStr == 'color'){
+						colorOptionValueId = optionValue;
+					}
+					if(colorOptionValueId == 0){
+						if(optionValueStr == 'size'){
+							colorOptionValueId = optionValue;
+						} else {
+							colorOptionValueId = optionValue;
+						}
+					}
+			        noOfOption++;
+
+		        	if(optionArr.indexOf(id) === -1){
+			        	if(noOfOption >= countOption){
+			        		enableCustomize = 1;
+			        	}else{
+			        		jQuery("#button-customize").attr('disabled', true);
+			        	}
+			        	optionArr.push(id);
+			        }else{
+			        	if(optionArr.length == countOption){
+			        		optionArr = [];
+			        	}
+			        }
+		        } else{
+		        	/*jQuery("#button-customize").attr('disabled', true);  */
+		        }
+			    if(enableCustomize == 1 || countOption ==0){
+
+			    	var productid={{ product_id }};	var refid = {{ (refid is defined and refid !='')?refid:0 }};
+			    	var catids = '{{ category_ids }}';
+					var imrdir = '{{ imprintnext_dir }}';
+					var root_url, store_id; 
+					store_id = {{ store_id }};
+					if (location.protocol == 'http:')
+						root_url = '{{ root_url}}';//HTTP_SERVER
+					else
+						root_url = '{{ root_ssl }}';//HTTPS_SERVER
+
+					var qty = jQuery("input[name=quantity]").val();
+					if(colorOptionValueId == 0){
+						if(refid){
+							var url = root_url+imrdir+"/index.html?id={{ product_id }}&vid={{ product_id }}&qty="+qty+"&store="+store_id+"&dpid="+refid;	
+						} else {
+							var url = root_url+imrdir+"/index.html?id={{ product_id }}&vid={{ product_id }}&qty="+qty+"&store="+store_id;	
+						}
+						jQuery("#button-customize").attr("rel",url);
+						jQuery("#button-customize").attr('disabled', false);
+						var ApiTemProUrl = root_url+imrdir+"/api/v1/template-products";
+						jQuery.get(ApiTemProUrl + "?prodcatID="+catids, function(responseData) {
+							if(responseData.is_enabled){
+						       var pbti = 1;
+							}else{
+								var pbti = 0;
+							}
+							var url = jQuery("#button-customize").attr("rel");
+							url = url+"&pbti="+pbti;
+							jQuery("#button-customize").attr("rel",url);
+			    		},'json');
+					}else{
+						var optValueList = "";
+						var selOptVal = "";
+						$(".selectOption option:selected").each(function () {
+						   var $this = $(this);
+						   if ($this.length) {
+						     	selOptVal = $this.val();
+						    	if(optValueList != "")
+						        	optValueList += "," + selOptVal;
+						        else
+						        	optValueList += selOptVal;
+						   }
+						});
+						var ApiUrl = root_url+imrdir+"/api/v1/product-variant-details";
+						jQuery.get(ApiUrl + "?product_id="+productid+"&option_id="+colorOptionValueId, function(responseData) {
+							if(responseData.status){
+						       productVariantId = responseData.data;						       
+							}else{
+								productVariantId = pid;
+							}
+							if(refid){
+								var newUrl = root_url+imrdir+"/index.html?id={{ product_id }}&vid="+productVariantId+"&qty="+qty+"&store="+store_id+"&option_id="+optValueList+"&dpid="+refid;								
+							} else {
+								var newUrl = root_url+imrdir+"/index.html?id={{ product_id }}&vid="+productVariantId+"&qty="+qty+"&store="+store_id+"&option_id="+optValueList;										
+							}
+							jQuery("#button-customize").attr("rel",newUrl);
+							jQuery("#button-customize").attr('disabled', false);
+							var ApiTemProUrl = root_url+imrdir+"/api/v1/template-products";
+							jQuery.get(ApiTemProUrl + "?prodcatID="+catids, function(responseData) {
+								if(responseData.is_enabled){
+							       var pbti = 1;
+								}else{
+									var pbti = 0;
+								}
+								var url = jQuery("#button-customize").attr("rel");
+								url = url+"&pbti="+pbti;
+								jQuery("#button-customize").attr("rel",url);
+				    		},'json');
+			    		});						
+					}
+			    	
+					jQuery("#button-customize").click(function(){
+						location.href = jQuery("#button-customize").attr("rel");					
+					});
+			    }
+		    });		    			
+		});
+		function getData(optinId){
+			var color =  jQuery("label#"+optinId).html();
+			return color.trim();
+		}		
+		/*jQuery("input[name=quantity]").bind("change paste keyup", function() {
+				var qty = jQuery("input[name=quantity]").val();
+				var url = jQuery("#button-customize").attr("rel");
+				url = url.split("&qty");
+				url = url[0]+"&qty="+qty;
+				jQuery("#button-customize").attr("rel",url);
+		}); */
+		</script>]]></add>
+	</operation>
+	</file>
+	<file path="system/library/cart/cart.php">
+		<operation>
+			<search position="before"><![CDATA[$this->add($cart['product_id'], $cart['quantity'], json_decode($cart['option']), $cart['recurring_id']);]]></search>
+			<add><![CDATA[$cart_id = $cart['cart_id'];]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$this->add($cart['product_id'], $cart['quantity'], json_decode($cart['option']), $cart['recurring_id']);]]></search>
+			<add><![CDATA[$query = $this->db->query("SELECT MAX(cart_id) AS cart_id FROM " . DB_PREFIX . "cart WHERE customer_id = '" . (int)$this->customer->getId() . "'");
+				$new_cart_id = $query->row['cart_id'];
+				if(isset($this->session->data['cart-design'][$cart_id])){
+					$this->session->data['cart-design'][$new_cart_id]['refid'] = $this->session->data['cart-design'][$cart_id]['refid'];
+					if (isset($this->session->data['cart-design'][$cart_id]['extra-price'])) {
+						$this->session->data['cart-design'][$new_cart_id]['extra-price'] = $this->session->data['cart-design'][$cart_id]['extra-price'];
+					}
+					if (isset($this->session->data['cart-design'][$cart_id]['is_variable_decoration'])) {
+						$this->session->data['cart-design'][$new_cart_id]['is_variable_decoration'] = $this->session->data['cart-design'][$cart_id]['is_variable_decoration'];
+					}
+				}]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[public function add($product_id, $quantity = 1, $option = array(), $recurring_id = 0) {]]></search>
+			<add><![CDATA[$ref_opt_id = 0;
+				$pro_opt_ref_val_id = 0;
+				$pro_opt_ref_id = 0;
+				$opt_query = $this->db->query("SELECT option_id FROM " . DB_PREFIX . "option_description WHERE name = 'refid'");
+				if ($opt_query->num_rows) {
+					$ref_opt_id = $opt_query->row['option_id'];
+					$opt_value_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product_option WHERE product_id = '" . (int)$product_id . "' AND option_id = '" . (int)$ref_opt_id . "'");
+					if ($opt_value_query->num_rows) {
+						$pro_opt_ref_id = $opt_value_query->row['product_option_id'];
+						if ($opt_value_query->row['value']) {
+							$pro_opt_ref_val_id = $opt_value_query->row['value'];
+							if ($pro_opt_ref_id > 0 && $pro_opt_ref_val_id > 0)
+								$option[$pro_opt_ref_id] = $pro_opt_ref_val_id;
+						}
+					}
+				}]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$product_discount_query = ]]></search>
+			<add><![CDATA[$discount_quantity = $cart['quantity'];]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[$product_data[] = array(]]></search>
+			<add><![CDATA[$refid = 0;
+						$cart_id = $cart['cart_id'];
+				if(isset($this->session->data['cart-design'][$cart_id])){
+				$refid = isset($this->session->data['cart-design'][$cart_id]['refid'])?$this->session->data['cart-design'][$cart_id]['refid']:0;
+				if (isset($this->session->data['cart-design'][$cart_id]['extra-price'])){
+					if(isset($this->session->data['cart-design'][$cart_id]['is_variable_decoration']) && $this->session->data['cart-design'][$cart_id]['is_variable_decoration']){
+						$price = (float)$this->session->data['cart-design'][$cart_id]['extra-price'];
+					} else {
+						$price = $price + (float)$this->session->data['cart-design'][$cart_id]['extra-price'];
+					}
+				}
+				};]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$product_data[] = array(]]></search>
+			<add><![CDATA['refid'           => $refid,]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[public function remove($cart_id) {]]></search>
+			<add><![CDATA[unset($this->session->data['cart-design'][$cart_id]);]]>
+			</add>
+		</operation>
+	</file>
+	<file path="catalog/controller/checkout/cart.php">
+		<operation>
+			<search position="before"><![CDATA[if (!$this->cart->hasStock() && (!$this->config->get('config_stock_checkout') || $this->config->get('config_stock_warning'))) {]]></search>
+			<add><![CDATA[$data['root_url'] = $this->config->get('config_url'); 
+				$data['root_ssl'] = $this->config->get('config_ssl');
+				$data['store_id'] = (int)$this->config->get('config_store_id');
+				$this->load->model('setting/setting');
+				$impr_dir = $this->model_setting_setting->getSettingValue('imprintnext_default_directory', $data['store_id']);
+				if($impr_dir)
+					$impr_dir = $impr_dir;
+				else 
+					$impr_dir = "designer";
+				$data['imprintnext_dir'] = $impr_dir;]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$data['products'][] = array(]]></search>
+			<add><![CDATA['product_id' => $product['product_id'],]]>
+			</add>
+		</operation>
+
+	</file>
+	
+	<file path="catalog/view/theme/*/template/checkout/cart.twig">
+		<operation>
+			<search position="after"><![CDATA[ {{ header }}]]></search>
+			<add><![CDATA[<style>.info-modal {
+				/*display: none;  Hidden by default */
+				position: fixed; /* Stay in place */
+				z-index: 999; /* Sit on top */
+				left: 0;
+				top: 0;
+				width: 100%; /* Full width */
+				height: 100%; /* Full height */
+				overflow: auto; /* Enable scroll if needed */
+				background-color: rgb(0,0,0); /* Fallback color */
+				background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+				opacity:1;
+			}
+			/* Modal Content/Box */
+			.modal-content {
+				background-color: #fefefe;
+				margin: 15% auto; /* 15% from the top and centered */
+				padding: 20px;
+				border: 1px solid #888;
+				width: 50%; /* Could be more or less, depending on screen size */
+			}
+
+			/* The Close Button */
+			.close {
+				color: #000;
+				float: right;
+				font-size: inherit;
+				font-weight: bold;
+			}
+
+			.close:hover,
+			.close:focus {
+				color: #aaa;
+				text-decoration: none;
+				cursor: pointer;
+			}</style>]]></add>
+		</operation>		
+		<operation>
+			<search position="after"><![CDATA[{% for product in products %}]]></search>
+			<add><![CDATA[
+				{% set refid = 0 %}
+				{% set optSze = '' %}
+				{% for option in product.option %}
+					{% if option.name == 'refid' %} 
+					{% set refid = option.value %}
+					{% endif %}
+					{% if ((option.name != 'refid' and option.name != 'xe_is_design' and option.name != 'is_catalog' and  option.name != 'disable_addtocart' and option.name != 'color' and option.name != 'Color') )%}
+					{% set optSze = option.value %}
+					{% endif %}
+				{% endfor %}
+			]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[<td class="text-center">{% if product.thumb %}]]></search>
+			<add><![CDATA[<td class="text-center">]]></add>
+		</operation>
+		<operation>
+			<search position="replace" index="1"><![CDATA[{% endif %}</td>]]></search>
+			<add><![CDATA[</td>]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[<img src="{{ product.thumb }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-thumbnail" />]]></search>
+			<add><![CDATA[<img src="{{ product.thumb }}" data-cart-id="{{ product.cart_id }}" alt="{{ product.name }}" title="{{ product.name }}" class="img-thumbnail" rel="{{ refid}}" product_id="{{product.product_id}}" data-attr-id="{{optSze}}"/>]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[<small>{{ option.name }}: {{ option.value }}</small> {% endfor %}]]></search>
+			<add><![CDATA[{% if option.name != 'refid' and option.name != 'xe_is_design' and option.name != 'is_catalog' and  option.name != 'disable_addtocart'  %} 
+			<small>{{ option.name|replace({'xe_': " "}) }}:{{ option.value }}</small>{% endif %}{% endfor %}]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[{{ footer }}]]></search>
+			<add><![CDATA[<script type="text/javascript">
+				jQuery(document).ready(function(){
+				var root_url, store_id, imprintnext_dir; 
+				store_id = {{ store_id }};
+				if (location.protocol == 'http:')
+					root_url = '{{ root_url }}';
+				else
+					root_url = '{{ root_ssl }}';
+
+				imprintnext_dir = '{{ imprintnext_dir }}';
+                jQuery('.table-bordered tbody tr td:first-child').each(function(index) {
+                	
+                    var refid = jQuery(this).find('img').attr('rel');
+                    var alt = jQuery(this).find('img').attr('alt');
+                    var title = jQuery(this).find('img').attr('title');
+                    var href = jQuery(this).find('a').attr('href');
+                    var cartId = jQuery(this).find('img').attr('data-cart-id');
+                    var product_id = jQuery(this).find('img').attr('product_id');
+                    var sizeValue = jQuery(this).find('img').attr('data-attr-id');
+                    var sizeAttr = '&attr='+sizeValue;
+                    var obj = jQuery(this);
+                    var isEdit = 1;
+                    var isPrint = 1;
+                    var customSize = "";
+					var unit = "";
+
+                    if (refid != undefined && refid != "" && refid != 0) {
+                    	jQuery(obj).html('<div class="loader"><img src="'+root_url+imprintnext_dir+'/assets/progress.svg" alt="Loading" /> </div>');
+                        var designData = [];
+                        var ApiUrl = root_url+imprintnext_dir+'/api/v1/preview-images';
+                        jQuery.get(ApiUrl + "?product_id="+product_id+"&custom_design_id="+refid, function(data) {
+							designData = data[refid];
+							var i;
+					        var imageTag = '';
+					        for (i = 0; i < designData.length; i++) {
+					            imageTag +="<a href="+href+"><img src='"+designData[i].customImageUrl[i]+"' data-cart-id='"+cartId+"' alt='"+alt+"' title='"+title+"' class='img-thumbnail' rel='"+refid+"' width='75px' height='75px'></a>";
+					            if(designData[i].variableDecorationSize && isEdit){
+					            	isPrint = 0;
+						            var customSize = designData[i].variableDecorationSize;
+						            var unit = designData[i].variableDecorationUnit;
+						            jQuery(obj).next().append('</br></br><small>Custom Size:' + customSize + ' ' + unit + ' </small>');
+					            }
+						        if(designData[i].display_edit && isEdit){
+						        	isEdit = 0;
+						        	var cartEditUrl = '';
+						        		cartEditUrl = root_url+imprintnext_dir+'/index.html?id='+designData[i].parentProductId+'&vid='+product_id+'&dpid='+refid+'&cart_item_id='+cartId+'&store='+store_id+sizeAttr;
+									jQuery(obj).next().next().next().append('<a type="button" data-toggle="tooltip"  title="Edit" class="btn btn-primary"  href="javascript:void(0)"" onclick="cartEdit(\'' + cartEditUrl + '\',\'' + cartId + '\');" style="margin-top: 5%;">Edit</a>');
+								}
+					        }
+					        jQuery(obj).html(imageTag);
+		    			});
+                    }
+				});
+			    
+			});
+			function cartEdit(cartUrl,cartId ){
+				var name = 'quantity['+cartId+']';
+				var qty = $("input[name='"+name+"']").val();
+				var qtyStr = '';
+				if(qty){
+					qtyStr = '&qty='+qty;
+				}else{
+					qtyStr = '&qty=1';;
+				}
+				cartUrl = cartUrl+qtyStr;
+				window.location.href = cartUrl;
+			}
+			</script>]]></add>
+		</operation>
+	</file>
+	<file path="catalog/view/theme/*/template/common/cart.twig">
+		<operation>
+			<search position="replace"><![CDATA[- <small>{{ option.name }} {{ option.value }}</small> {% endfor %}]]></search>
+			<add><![CDATA[{% if option.name != 'refid' and option.name != 'xe_is_design' and option.name != 'is_catalog' and  option.name != 'disable_addtocart'  %} 
+			- <small>{{ option.name }} {{ option.value }}</small> {% endif %}{% endfor %}]]></add>
+		</operation>
+	</file>
+	<file path="catalog/model/checkout/order.php">
+		<operation>
+			<search position="before"><![CDATA[$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$order_product['product_id'] . "' AND subtract = '1'");]]></search>
+			<add><![CDATA[$order_variant_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "product p LEFT JOIN " . DB_PREFIX . "product_variant pv ON (p.product_id = pv.product_id) WHERE p.product_id = '" . (int)$order_product['product_id'] . "' LIMIT 1");
+					$res = $order_variant_query->rows;
+					if ($res[0]['is_variant'] =='1') {
+						$this->db->query("UPDATE " . DB_PREFIX . "product SET quantity = (quantity - " . (int)$order_product['quantity'] . ") WHERE product_id = '" . (int)$res[0]['variant_id'] . "' AND subtract = '1'");
+					}]]>
+			</add>
+		</operation>
+	</file>
+	<file path="catalog/model/account/order.php">
+		<operation>
+			<search position="before"><![CDATA[public function getOrderProduct($order_id, $order_product_id) {]]></search>
+			<add><![CDATA[    public function getOrderList($data = array()) {
+        $sql = "SELECT DISTINCT o.order_id, o.firstname, o.lastname, (SELECT os.name FROM " . DB_PREFIX . "order_status os WHERE os.order_status_id = o.order_status_id AND os.language_id = '" . (int)$this->config->get('config_language_id') . "') AS status, o.shipping_code, o.total, o.currency_code, o.currency_value, o.date_added, o.date_modified FROM `" . DB_PREFIX . "order` o LEFT JOIN " . DB_PREFIX . "order_option oo ON (oo.order_id = o.order_id)";
+        if (isset($data['filter_order_status'])) {
+            $implode = array();
+            $order_statuses = explode(',', $data['filter_order_status']);
+            foreach ($order_statuses as $order_status_id) {
+                $implode[] = "o.order_status_id = '" . (int)$order_status_id . "'";
+            }
+            if ($implode) {
+                $sql .= " WHERE (" . implode(" OR ", $implode) . ")";
+            } else {
+            }
+        } else {
+            $sql .= " WHERE o.order_status_id > '0'";
+        }
+		if (!empty($data['last_order_id'])) {
+            $sql .= " AND o.order_id < '" . (int)$data['last_order_id'] . "'";
+        }
+        if (!empty($data['filter_order_id'])) {
+            $sql .= " AND o.order_id = '" . (int)$data['filter_order_id'] . "'";
+        }
+        if (!empty($data['filter_customer'])) {
+            $sql .= " AND CONCAT(o.firstname, ' ', o.lastname) LIKE '%" . $this->db->escape($data['filter_customer']) . "%'";
+        }
+        if (!empty($data['filter_date_added'])) {
+            $sql .= " AND DATE(o.date_added) = DATE('" . $this->db->escape($data['filter_date_added']) . "')";
+        }
+		if (!empty($data['filter_date_added_from'])) {
+            $sql .= " AND DATE(o.date_added) >= DATE('" . $this->db->escape($data['filter_date_added_from']) . "')";
+        }
+		if (!empty($data['filter_date_added_to'])) {
+            $sql .= " AND DATE(o.date_added) <= DATE('" . $this->db->escape($data['filter_date_added_to']) . "')";
+        }
+        if (!empty($data['filter_date_modified'])) {
+            $sql .= " AND DATE(o.date_modified) = DATE('" . $this->db->escape($data['filter_date_modified']) . "')";
+        }
+        if (!empty($data['filter_total'])) {
+            $sql .= " AND o.total = '" . (float)$data['filter_total'] . "'";
+        }
+        if (!empty($data['customer_id']) && $data['customer_id'] > 0) {
+            $sql .= " AND o.customer_id = '" . $data['customer_id'] . "'";
+        }
+		$storeId = (isset($_GET['store']) && $_GET['store']!='')? $_GET['store'] : 0;
+		$sql .= "AND o.store_id = '".$storeId. "'";
+        $sort_data = array(
+                          'o.order_id',
+                          'o.firstname',
+                          'status',
+                          'o.date_added',
+                          'o.date_modified',
+                          'o.total'
+                          );
+        if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+            $sql .= " ORDER BY " . $data['sort'];
+        } else {
+            $sql .= " ORDER BY o.order_id";
+        }
+        if (isset($data['order']) && ($data['order'] == 'DESC')) {
+            $sql .= " DESC";
+        } else {
+            $sql .= " ASC";
+        }
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] !='') {
+                $data['start'] = $data['start'];
+            }
+            if ($data['limit'] < 1) {
+                $data['limit'] = 20;
+            }
+            $sql .= " LIMIT " . $data['start'] . " , " . (int)$data['limit'];
+        }
+        $query = $this->db->query($sql);
+        return $query->rows;
+    }]]>
+			</add>
+		</operation>
+		<operation>
+			<search position="before"><![CDATA[public function getOrderProduct($order_id, $order_product_id) {]]></search>
+			<add><![CDATA[    public function getOrderDetail($order_id) {
+		$order_query = $this->db->query("SELECT *, (SELECT CONCAT(c.firstname, ' ', c.lastname) FROM " . DB_PREFIX . "customer c WHERE c.customer_id = o.customer_id) AS customer FROM `" . DB_PREFIX . "order` o WHERE o.order_id = '" . (int)$order_id . "'");
+
+		if ($order_query->num_rows) {
+			$reward = 0;
+
+			$order_product_query = $this->db->query("SELECT * FROM " . DB_PREFIX . "order_product WHERE order_id = '" . (int)$order_id . "'");
+
+			foreach ($order_product_query->rows as $product) {
+				$reward += $product['reward'];
+			}
+
+			$country_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE country_id = '" . (int)$order_query->row['payment_country_id'] . "'");
+
+			if ($country_query->num_rows) {
+				$payment_iso_code_2 = $country_query->row['iso_code_2'];
+				$payment_iso_code_3 = $country_query->row['iso_code_3'];
+			} else {
+				$payment_iso_code_2 = '';
+				$payment_iso_code_3 = '';
+			}
+
+			$zone_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "zone` WHERE zone_id = '" . (int)$order_query->row['payment_zone_id'] . "'");
+
+			if ($zone_query->num_rows) {
+				$payment_zone_code = $zone_query->row['code'];
+			} else {
+				$payment_zone_code = '';
+			}
+
+			$country_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "country` WHERE country_id = '" . (int)$order_query->row['shipping_country_id'] . "'");
+
+			if ($country_query->num_rows) {
+				$shipping_iso_code_2 = $country_query->row['iso_code_2'];
+				$shipping_iso_code_3 = $country_query->row['iso_code_3'];
+			} else {
+				$shipping_iso_code_2 = '';
+				$shipping_iso_code_3 = '';
+			}
+
+			$zone_query = $this->db->query("SELECT * FROM `" . DB_PREFIX . "zone` WHERE zone_id = '" . (int)$order_query->row['shipping_zone_id'] . "'");
+
+			if ($zone_query->num_rows) {
+				$shipping_zone_code = $zone_query->row['code'];
+			} else {
+				$shipping_zone_code = '';
+			}
+
+			if ($order_query->row['affiliate_id']) {
+				$affiliate_id = $order_query->row['affiliate_id'];
+			} else {
+				$affiliate_id = 0;
+						$affiliate_firstname = '';			$affiliate_lastname = '';			$language_code = '';			$language_directory = '';
+			}
+
+			return array(
+				'order_id'                => $order_query->row['order_id'],
+				'invoice_no'              => $order_query->row['invoice_no'],
+				'invoice_prefix'          => $order_query->row['invoice_prefix'],
+				'store_id'                => $order_query->row['store_id'],
+				'store_name'              => $order_query->row['store_name'],
+				'store_url'               => $order_query->row['store_url'],
+				'customer_id'             => $order_query->row['customer_id'],
+				'customer'                => $order_query->row['customer'],
+				'customer_group_id'       => $order_query->row['customer_group_id'],
+				'firstname'               => $order_query->row['firstname'],
+				'lastname'                => $order_query->row['lastname'],
+				'email'                   => $order_query->row['email'],
+				'telephone'               => $order_query->row['telephone'],
+				'fax'                     => $order_query->row['fax'],
+				'custom_field'            => "",
+				'payment_firstname'       => $order_query->row['payment_firstname'],
+				'payment_lastname'        => $order_query->row['payment_lastname'],
+				'payment_company'         => $order_query->row['payment_company'],
+				'payment_address_1'       => $order_query->row['payment_address_1'],
+				'payment_address_2'       => $order_query->row['payment_address_2'],
+				'payment_postcode'        => $order_query->row['payment_postcode'],
+				'payment_city'            => $order_query->row['payment_city'],
+				'payment_zone_id'         => $order_query->row['payment_zone_id'],
+				'payment_zone'            => $order_query->row['payment_zone'],
+				'payment_zone_code'       => $payment_zone_code,
+				'payment_country_id'      => $order_query->row['payment_country_id'],
+				'payment_country'         => $order_query->row['payment_country'],
+				'payment_iso_code_2'      => $payment_iso_code_2,
+				'payment_iso_code_3'      => $payment_iso_code_3,
+				'payment_address_format'  => $order_query->row['payment_address_format'],
+				'payment_custom_field'    => "",
+				'payment_method'          => $order_query->row['payment_method'],
+				'payment_code'            => $order_query->row['payment_code'],
+				'shipping_firstname'      => $order_query->row['shipping_firstname'],
+				'shipping_lastname'       => $order_query->row['shipping_lastname'],
+				'shipping_company'        => $order_query->row['shipping_company'],
+				'shipping_address_1'      => $order_query->row['shipping_address_1'],
+				'shipping_address_2'      => $order_query->row['shipping_address_2'],
+				'shipping_postcode'       => $order_query->row['shipping_postcode'],
+				'shipping_city'           => $order_query->row['shipping_city'],
+				'shipping_zone_id'        => $order_query->row['shipping_zone_id'],
+				'shipping_zone'           => $order_query->row['shipping_zone'],
+				'shipping_zone_code'      => $shipping_zone_code,
+				'shipping_country_id'     => $order_query->row['shipping_country_id'],
+				'shipping_country'        => $order_query->row['shipping_country'],
+				'shipping_iso_code_2'     => $shipping_iso_code_2,
+				'shipping_iso_code_3'     => $shipping_iso_code_3,
+				'shipping_address_format' => $order_query->row['shipping_address_format'],
+				'shipping_custom_field'   => "",
+				'shipping_method'         => $order_query->row['shipping_method'],
+				'shipping_code'           => $order_query->row['shipping_code'],
+				'comment'                 => $order_query->row['comment'],
+				'total'                   => $order_query->row['total'],
+				'reward'                  => $reward,
+				'order_status_id'         => $order_query->row['order_status_id'],
+				'affiliate_id'            => $order_query->row['affiliate_id'],
+				'affiliate_firstname'     => $affiliate_firstname,
+				'affiliate_lastname'      => $affiliate_lastname,
+				'commission'              => $order_query->row['commission'],
+				'language_id'             => $order_query->row['language_id'],
+				'language_code'           => $language_code,
+				'language_directory'      => $language_directory,
+				'currency_id'             => $order_query->row['currency_id'],
+				'currency_code'           => $order_query->row['currency_code'],
+				'currency_value'          => $order_query->row['currency_value'],
+				'ip'                      => $order_query->row['ip'],
+				'forwarded_ip'            => $order_query->row['forwarded_ip'],
+				'user_agent'              => $order_query->row['user_agent'],
+				'accept_language'         => $order_query->row['accept_language'],
+				'date_added'              => $order_query->row['date_added'],
+				'date_modified'           => $order_query->row['date_modified']
+			);
+		} else {
+			return;
+		}
+	}]]>
+			</add>
+		</operation>
+	</file>
+	<file path="catalog/controller/checkout/success.php">
+		<operation>
+			<search position="after"><![CDATA[$data['header'] = $this->load->controller('common/header');]]></search>
+			<add><![CDATA[if(isset($activity_data) && !empty($activity_data)){
+			if (isset($this->request->server['HTTPS']) && (($this->request->server['HTTPS'] == 'on') || ($this->request->server['HTTPS'] == '1'))) {
+				$base_url = $this->config->get('config_ssl');
+			} else {
+				$base_url = $this->config->get('config_url');
+			}
+			$this->load->model('setting/setting');
+			$imprintnext_dir = $this->model_setting_setting->getSettingValue('imprintnext_default_directory', (int)$this->config->get('config_store_id'));
+			if($imprintnext_dir)
+				$api_dir = $imprintnext_dir;
+			else 
+				$api_dir = 'designer';
+
+			$url = $base_url.$api_dir."/api/v1/orders/create-order-files/" . $activity_data['order_id'];
+			$ch = curl_init();  
+		 
+			curl_setopt($ch,CURLOPT_URL,$url);
+			curl_setopt($ch,CURLOPT_RETURNTRANSFER,true);
+			curl_setopt($ch,CURLOPT_HEADER, false); 
+		 
+			$output=curl_exec($ch);
+		 
+			curl_close($ch);
+		}]]></add>
+		</operation>
+		<operation>
+			<search position="after"><![CDATA[$this->cart->clear();]]></search>
+			<add><![CDATA[// Add to activity log
+			$this->load->model('account/activity');
+			if(isset($this->session->data['order_id']) && $this->session->data['order_id']){
+				if ($this->customer->isLogged()) {
+					$activity_data = array(
+						'customer_id' => $this->customer->getId(),
+						'name'        => $this->customer->getFirstName() . ' ' . $this->customer->getLastName(),
+						'order_id'    => $this->session->data['order_id']
+					);
+					
+				} else {
+					$activity_data = array(
+						'name'     => $this->session->data['guest']['firstname'] . ' ' . $this->session->data['guest']['lastname'],
+						'order_id' => $this->session->data['order_id']
+					);
+				}
+			}]]></add>
+		</operation>			
+	</file>
+
+</modification>

@@ -1,0 +1,37 @@
+#imprintnextcustomizebutton_block_home .customize_outer_div {
+    height: 50px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+#imprintnextcustomizebutton_block_home .customize_btn {
+    background: linear-gradient(#009ad0, #007ab7)!important;
+    border-color: #0079b6 #006fa8 #012740;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    color: #fff;
+    display: block;
+    font-weight: bold;
+    margin-left: 20px;
+    padding: 8px 20px;
+    position: relative;
+    width: 203.50px;
+    height: 50px;
+}
+
+#imprintnextcustomizebutton_block_home .customize_btn:hover {
+    background: linear-gradient(#007ab7, #009ad0)!important;
+    border-color: #0079b6 #006fa8 #012740;
+    border-radius: 5px;
+    border-style: solid;
+    border-width: 1px;
+    color: #fff;
+    display: block;
+    font-weight: bold;
+    margin-left: 20px;
+    padding: 8px 20px;
+    position: relative;
+    width: 203.50px;
+    height: 50px;
+}

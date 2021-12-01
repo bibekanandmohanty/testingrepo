@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<config_detail>
+   <url_detail>
+	   <store_directory/>
+	   <store_version/>
+	   <api_url/>
+	   <xetool_dir/>
+   </url_detail>
+	<designer_tool_dbconnection>
+		<host/>
+		<dbuser/>
+		<dbpass/>
+		<dbname/>
+	</designer_tool_dbconnection>
+</config_detail>

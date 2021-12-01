@@ -1,0 +1,21 @@
+{
+    "module_list": [{
+        "name": "imprintnextcustomprice",
+        "version": "1.0.0",
+        "author": "imprintnext",
+        "tab": "customprice",
+        "hook_name": ["actionProductUpdate", "displayFooterProduct", "actionProductDelete", "actionCartSave"]
+    }, {
+        "name": "imprintnextdesignertool",
+        "version": "1.0.0",
+        "author": "imprintnext",
+        "tab": "designertool",
+        "hook_name": ["displayProductButtons", "newOrder", "actionOrderStatusPostUpdate", "displayShoppingCartFooter", "actionAdminControllerSetMedia", "actionProductUpdate", "displayAdminProductsExtra", "displayInvoice"]
+    }, {
+        "name": "imprintnextorderdetials",
+        "version": "1.0.0",
+        "author": "imprintnext",
+        "tab": "orderdetials",
+        "hook_name": ["orderConfirmation"]
+    }]
+}

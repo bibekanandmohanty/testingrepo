@@ -139,4 +139,5 @@ $s3->deleteBucket(['Bucket' => $bucket]);
  real-world applications should always check for errors.
  See the Error Handling section in the developer guide for more information:
  http://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/basic-usage.html#synchronous-error-handling
+ http://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/basic-usage.html#synchronous-error-handling
 */

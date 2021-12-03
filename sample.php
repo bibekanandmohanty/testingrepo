@@ -133,6 +133,9 @@ $batch->delete();
 
 echo "Deleting bucket {$bucket}\n";
 $s3->deleteBucket(['Bucket' => $bucket]);
+$s3->deleteBucket(['Bucket' => $bucket]);
+$s3->deleteBucket(['Bucket' => $bucket]);
+$s3->deleteBucket(['Bucket' => $bucket]);
 
 /*
  Although this sample didn't check for errors when calling service operations,

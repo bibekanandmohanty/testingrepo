@@ -1,0 +1,2115 @@
+<!-- header start -->
+<div class="header" *ngIf="isAllowShowView">
+  <div class="container">
+    <div class="header-inner">
+      <div class="brand-label">
+        <figure *ngIf="quoteSetting.company_logo">
+          <img alt="logo" data-src="images/inext.svg" data-src-retina="images/inext.svg"
+            [attr.src]="quoteSetting.company_logo" />
+        </figure>
+      </div>
+      <div class="actionBtn">
+        <div class="btn"
+          [class.disabled]="quoteDetailsLoader || quotationDetails && quotationDetails.quote_status === 'Rejected'"
+          (click)="downloadPdf()">
+          <i class="pg pg-download"></i> Download Quotation(PDF)
+        </div>
+        <div class="btn"
+          [class.disabled]="quoteDetailsLoader ||  quotationDetails && quotationDetails.quote_status === 'Rejected'"
+          (click)="printQuotation()"><i class="pg pg-printer"></i> Print</div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- header end -->
+
+<div class="container" [hidden]="!isAllowShowView">
+  <ngx-content-loading *ngIf="quoteDetailsLoader" [speed]="'1000ms'" [width]="1110" [height]="600"
+    [primaryColor]="'#f1eff1'" [secondaryColor]="'#dbd6d6'">
+    <svg:g ngx-rect width="1100" height="50" y="15" x="0" rx="10" ry="10"></svg:g>
+    <svg:g ngx-rect width="1100" height="105" y="75" x="0" rx="10" ry="10"></svg:g>
+    <svg:g ngx-rect width="1100" height="400" y="190" x="0" rx="10" ry="10"></svg:g>
+  </ngx-content-loading>
+  <div id="msform" class="dt-base theme-default"
+    *ngIf="(!quoteDetailsLoader && quotationDetails && quotationDetails.quote_id)">
+    <!-- Progress bar -->
+    <div class="dt-elements dt-progress-bar" id="hidePrint">
+      <div class="d-flex justify-content-between align-items-center">
+        <ul class="progressbar-custom">
+          <ng-container *ngFor="let item of quotationSteps; let index = index">
+            <li class="step step--incomplete" [class.step--active]="item.isActive"
+              [ngClass]="{'step--complete': item.isComplete}">
+              <div class="progress-txt">
+                <span class="num-list">Step 0{{index+1}}</span> {{item.title}}
+              </div>
+            </li>
+          </ng-container>
+          <!-- <li class="step step--incomplete step--active">
+                <div class="progress-txt">
+                  <span class="num-list">Step 01</span> Quotation
+                </div>
+              </li>
+              <li class="step step--incomplete step--inactive">
+                <div class="progress-txt">
+                  <span class="num-list">Step 02</span> Confirmation
+                </div>
+              </li>
+              <li class="step step--incomplete step--inactive">
+                <div class="progress-txt">
+                  <span class="num-list">Step 03</span> Payment
+                </div>
+              </li>
+              <li class="step step--incomplete step--inactive">
+                <div class="progress-txt">
+                  <span class="num-list">Step 04</span> Complete
+                </div>
+              </li> -->
+        </ul>
+        <button class="btn btn-light btn-lg" [disabled]="quotationDetails.quote_status === 'Rejected' || !(quotationDetails.customer_id)"
+          data-toggle="modal" data-target="#filter"
+          (click)="showConversation()">
+          <i class="pg pg-comment"></i> Conversation 
+        </button>
+      </div>
+    </div>
+
+    <div class="dt-elements dt-canvas">
+      <!-- Notification -->
+      <div class="notificationBox">
+        <ng-container *ngIf="!makePaymentForm && !paymentSuccess && !paymentFailure">
+          <!-- Notification for approval -->
+          <div id="requestQuote" class="alert alert-primary" *ngIf="isShowQuoteApprovalSection() && quotationDetails.is_ready_to_send === 1">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="alert-text">
+                <h4 class="alert-heading">Quotation approval!</h4>
+                <p class="alert-subheading mb-0">
+                  By clicking approve, you acknowledge the accuracy of this
+                  invoice.
+                </p>
+              </div>
+              <div class="alert-btns" >
+                <div class="btn btn-lg btn-success next action-button" (click)="changeQuoteStatus('approved')">
+                  Approve
+                </div>
+                <div class="btn btn-lg btn-danger action-button text-white" data-toggle="modal"
+                  data-target="#quote_reject_modal" (click)="changeQuoteStatus('rejected')">
+                  Reject
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Approval Successful -->
+          <ng-container *ngIf="quoteSetting.is_payment_enable">
+          <div id="quoteApproved" class="alert alert-success"
+            *ngIf="isPaymentApprovalSection() && !showMakePaymentSection">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="tick-icon"></div>
+              <div class="alert-text">
+                <h4 class="alert-heading">Quotation Approved!</h4>
+                <p class="alert-subheading mb-0">
+                  Make a payment to start your production.
+                </p>
+              </div>
+              <div class="alert-btns">
+                <div class="btn btn-lg btn-primary next action-button" (click)="nextPaymentStep()">
+                  Proceed to payment <i class="pg pg-arrow_right"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+          </ng-container>
+
+          <!-- Approval Declined -->
+          <div id="quoteDeclined" class="canvasWrap mb-3" *ngIf="!quoteSetting.is_payment_enable && isPaymentApprovalSection()">
+            <div class="alert alert-warning">
+              <div class="tick-icon"></div>
+              <div class="alert-text">
+                <h4 class="alert-heading">Quotation is approved.</h4>
+                <p class="alert-subheading mb-0">
+                  For payments, please contact <a href="mail:{{quoteSetting.sender_email}}">{{quoteSetting.sender_email}}</a>
+                </p>
+              </div>
+            </div>
+            <!-- <div class="row">
+              <div class="col-4">
+                <label>Preview</label>
+                <div class="nx-drop-box">
+                  <input type="file" style="
+                      width: 0px;
+                      height: 0px;
+                      position: absolute;
+                      padding: 0px;
+                      margin: 0px;
+                      overflow: hidden;
+                      opacity: 0;
+                    " />
+                  <i class="nxi nxi-upload nx-drop-icon" style="overflow: hidden;"></i>
+                  <span class="nx-drop-text">Drag and drop file here</span>
+                  <a class="nx-drop-btn" href="" style="overflow: hidden;">Browse File</a>
+                </div>
+              </div>
+              <div class="col-8">
+                <label>Add a note</label>
+                <div class="card text-center">
+                  <div class="card-body p-0">
+                    <textarea class="form-control border-0" [(ngModel)]="rejectMessage.message" rows="3"
+                      placeholder="Enter the reason for reject the quotation." style="height:86px;"></textarea>
+                  </div>
+                  <div class="card-footer text-left p-2">
+                    <div class="btn btn-dark btn-sm pl-3 pr-3" (click)="rejectQuoteOrder()">Send artwork sample
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="alert-btns justify-content-end">
+              <div class="btn btn-lg btn-primary next action-button" (click)="nextPaymentStep()">
+                Proceed Payment <i class="fa fa-arrow-right"></i>
+              </div>
+            </div> -->
+          </div>
+
+          <!-- Payment notification -->
+          <div id="quotePayment" class="alert alert-primary" *ngIf="showMakePaymentSection">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="alert-text">
+                <h4 class="alert-heading">Ready to make a payment?</h4>
+                <p class="alert-subheading mb-0">
+                  We will be notified immediately via email.
+                </p>
+              </div>
+              <div class="alert-btns">
+                <div class="d-flex flex-column">
+                  <div class="priceInfo">
+                    Due Amount :
+                    <strong>{{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.due_amount)}}</strong>
+                  </div>
+                  <div class="priceInfo">
+                    Requested Amount :
+                    <strong>{{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.request_payment)}}</strong>
+                  </div>
+                  <div class="priceInfo">
+                    Paid Amount : <strong>{{globalSettings.currency}}{{getTotalPaidAmount()}}</strong>
+                  </div>
+                </div>
+                <div class="btn btn-lg btn-primary next action-button" (click)="setUpmakePaymentForm()">
+                  Make a payment
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Approval Section Area -->
+          <!-- <div class="alert alert-primary" *ngIf="isPaymentApprovalSection() && !showMakePaymentSection">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="alert-text">
+                <h4 class="alert-heading">Quotation Approved!</h4>
+                <p class="alert-subheading mb-0">
+                  Make a payment to start your production.
+                </p>
+              </div>
+              <div class="alert-btns">
+                <div class="btn btn-lg btn-primary next action-button" (click)="nextPaymentStep()">
+                  Proceed Payment <i class="fa fa-arrow-right"></i>
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+          <!-- Partial payment approval Section Area -->
+          <!-- <div class="alert alert-primary" *ngIf="showMakePaymentSection">
+            <div class="d-flex justify-content-between align-items-center">
+              <div class="alert-text">
+                <h4 class="alert-heading">Ready to make a payment?</h4>
+                <p class="alert-subheading mb-0">
+                  We will notified immidiately via email.
+                </p>
+              </div>
+              <div class="alert-text pull-right">
+                <table>
+                  <tr>
+                    <td style="padding: 0 20px 4px 0px;">
+                      Due Amount
+                    </td>
+                    <td style="padding: 0 20px 4px 0px;">
+                      : <strong>{{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.due_amount)}}</strong>
+                    </td>
+                  </tr>
+                  <tr *ngIf="quotationDetails.payment_log.length > 0">
+                    <td style="padding: 0 20px 4px 0px;">
+                      Paid Amount
+                    </td>
+                    <td style="padding: 0 20px 4px 0px;">
+                      : <strong>
+                        {{globalSettings.currency}}{{getTotalPaidAmount()}}
+                      </strong>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <div class="alert-btns">
+                <div class="btn btn-lg btn-primary next action-button" (click)="setUpmakePaymentForm()">
+                  Make payment
+                </div>
+              </div>
+            </div>
+          </div> -->
+
+        </ng-container>
+      </div>
+
+      <!-- Main Content -->
+      <div class="contentBox">
+
+        <!-- Quote Section -->
+        <ng-container *ngIf="!makePaymentForm && !paymentSuccess && !paymentFailure">
+          <div id="quote" class="quoteSection">
+            <!-- Order details start -->
+            <div class="canvasWrap mb-4">
+              <!-- invoice header -->
+              <table width="100%" style="min-width: 100%;">
+                <tr>
+                  <td style="vertical-align: top;">
+                    <h3 class="title mb-3">
+                      Quotation
+                      <span class="quote-approval-badge"
+                        *ngIf="quotationDetails.quote_status !== 'Approved' && quotationDetails.quote_status !== 'Rejected' && quotationDetails.quote_status !== 'Ordered'">Awaiting
+                        Approval</span>
+                      <span class="quote-rejected-badge" *ngIf="quotationDetails.quote_status === 'Rejected'">
+                        Rejected
+                      </span>
+                      <span class="payment-not-done-badge"
+                        *ngIf="(quotationDetails.due_amount !== 0 && quotationDetails.quote_status === 'Approved') && !checkpaymentLog()">
+                        Payment not done
+                      </span>
+                      <span class="payment-partial-badge"
+                        *ngIf="quotationDetails.due_amount !== 0 && (quotationDetails.quote_status === 'Approved' || quotationDetails.quote_status === 'Ordered') && checkpaymentLog()">
+                        Partialy paid
+                      </span>
+                      <span class="payment-fully-badge"
+                        *ngIf="quotationDetails.due_amount === 0 &&( quotationDetails.quote_status === 'Approved' || quotationDetails.quote_status === 'Ordered')">
+                        Full paid
+                      </span>
+                      <span class="payment-not-done-badge"
+                        *ngIf="(convertTwoDescimal(quotationDetails.due_amount) === convertTwoDescimal(quotationDetails.quote_total) && quotationDetails.quote_status === 'Ordered' && quotationDetails.payment_log.length === 0)">
+                        Payment not done
+                      </span>
+                    </h3>
+                    <table>
+                      <tr>
+                        <td style="padding: 0 20px 4px 0px;">
+                          Quotation Number
+                        </td>
+                        <td style="padding: 0 20px 4px 0px;">
+                          : <strong>{{quotationDetails.quote_id}}</strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 0 20px 4px 0px;">
+                          Shipping Date
+                        </td>
+                        <td style="padding: 0 20px 4px 0px;">
+                          : <strong>
+                            {{quotationDetails.ship_by_date | dateTimeFilter: "Do MMMM, YYYY"}}
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 0 20px 4px 0px;">
+                          Delivery Date
+                        </td>
+                        <td style="padding: 0 20px 4px 0px;">
+                          : <strong>
+                            {{quotationDetails.exp_delivery_date | dateTimeFilter: "Do MMMM, YYYY"}}
+                          </strong>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="vertical-align: top; text-align: right;" *ngIf="quoteSetting">
+                    <figure style="margin: 0 0 0 auto; width: 120px;">
+                      <img alt="logo" [attr.src]="quoteSetting.company_logo" style="max-width: 100%;" />
+                    </figure>
+                    <address>
+                      <span *ngIf="quoteSetting.address">
+                        {{quoteSetting.address}},
+                      </span> <br />
+                      <span *ngIf="quoteSetting.country">
+                        {{quoteSetting.country}},
+                      </span>
+                      <span *ngIf="quoteSetting.state">
+                        {{quoteSetting.state}},
+                      </span>
+                      <span *ngIf="quoteSetting.city">
+                        {{quoteSetting.city}}-
+                      </span>
+                      <span *ngIf="quoteSetting.zip_code">
+                        {{quoteSetting.zip_code}},
+                      </span><br>
+                      <span *ngIf="quoteSetting.sender_email">
+                        {{quoteSetting.sender_email}},
+                      </span><br>
+                      <span *ngIf="quoteSetting.phone_number">
+                        {{quoteSetting.phone_number}}
+                      </span><br>
+                    </address>
+                  </td>
+                </tr>
+              </table>
+              <hr style="margin-bottom: 30px;" />
+              <!-- customer info -->
+              <table style="min-width: 100%; margin-bottom: 30px;">
+                <tr>
+                  <td *ngIf="quotationDetails.customer_id" style="vertical-align: top; width: 25%;">
+                    <small>Quotation for</small>
+                    <h5>
+                      {{quotationDetails.customer.name ? quotationDetails.customer.name : quotationDetails.customer.email}}
+                    </h5>
+                    <address>
+                      {{quotationDetails.customer.email}}<br />
+                      {{quotationDetails.customer.phone ? quotationDetails.customer.phone : null}}
+                    </address>
+                  </td>
+                  <td *ngIf="(billingAddress.address_1 && billingAddress.address_1 !== '') ||
+                    ((billingAddress.country_name && billingAddress.country_name !== '') || (billingAddress.country && billingAddress.country !== '')) ||
+                    ((billingAddress.state_name && billingAddress.state_name !== '') || (billingAddress.state && billingAddress.state !== '')) ||
+                    (billingAddress.city && billingAddress.city !== '') ||
+                    (billingAddress.postcode && billingAddress.postcode !== '')" style="vertical-align: top; width: 30%">
+                    <small>Billing Address</small>
+                    <address *ngIf="billingAddress">
+                      <!-- {{billingAddress.address_1}},<br />
+                      {{billingAddress.country_name ? billingAddress.country_name : billingAddress.country}},
+                      {{billingAddress.state_name ? billingAddress.state_name : billingAddress.state}},<br>
+                      {{billingAddress.city}}-{{billingAddress.postcode}} -->
+
+                      <span *ngIf="billingAddress.address_1 && billingAddress.address_1 !== ''">
+                        {{billingAddress.address_1}},<br />
+                      </span>
+                      <span *ngIf="(billingAddress.country_name && billingAddress.country_name !== '') || (billingAddress.country && billingAddress.country !== '')">
+                        {{billingAddress.country_name ? billingAddress.country_name : billingAddress.country}},
+                      </span>
+                      <span *ngIf="(billingAddress.state_name && billingAddress.state_name !== '') || (billingAddress.state && billingAddress.state !== '')">
+                        {{billingAddress.state_name ? billingAddress.state_name : billingAddress.state}},<br>
+                      </span>
+                      <span *ngIf="billingAddress.city !== ''">
+                        {{billingAddress.city}}-
+                      </span>
+                      <span *ngIf="billingAddress.postcode && billingAddress.postcode !== ''">
+                        {{billingAddress.postcode}}
+                      </span>
+                    </address>
+                  </td>
+                  <td *ngIf="(shippingAddress.address_1 && shippingAddress.address_1 !== '') ||
+                    ((shippingAddress.country_name && shippingAddress.country_name !== '') || (shippingAddress.country && shippingAddress.country !== '')) ||
+                    ((shippingAddress.state_name && shippingAddress.state_name !== '') || (shippingAddress.state && shippingAddress.state !== '')) ||
+                    (shippingAddress.city && shippingAddress.city !== '') ||
+                    (shippingAddress.postcode && shippingAddress.postcode !== '')" style="vertical-align: top; width: 30%">
+                    <small>Shipping Address</small>
+                    <address *ngIf="shippingAddress">
+                      <!-- {{shippingAddress.address_1}},<br />
+                      {{shippingAddress.country_name ? shippingAddress.country_name : shippingAddress.country}},
+                      {{shippingAddress.state_name ? shippingAddress.state_name : shippingAddress.state}},<br>
+                      {{shippingAddress.city}}-{{shippingAddress.postcode}} -->
+
+                      <span *ngIf="shippingAddress.address_1 && shippingAddress.address_1 !== ''">
+                        {{shippingAddress.address_1}},<br />
+                      </span>
+                      <span *ngIf="(shippingAddress.country_name && shippingAddress.country_name !== '') || (shippingAddress.country && shippingAddress.country !== '')">
+                        {{shippingAddress.country_name ? shippingAddress.country_name : shippingAddress.country}},
+                      </span>
+                      <span *ngIf="(shippingAddress.state_name && shippingAddress.state_name !== '') || (shippingAddress.state && shippingAddress.state !== '')">
+                        {{shippingAddress.state_name ? shippingAddress.state_name : shippingAddress.state}},<br>
+                      </span>
+                      <span *ngIf="shippingAddress.city !== ''">
+                        {{shippingAddress.city}}-
+                      </span>
+                      <span *ngIf="shippingAddress.postcode && shippingAddress.postcode !== ''">
+                        {{shippingAddress.postcode}}
+                      </span>
+                    </address>
+                  </td>
+                  <td style="vertical-align: top; text-align: right; width: 15%">
+                    <small *ngIf="globalSettings.post_fix">Balance Due ({{globalSettings.post_fix}})</small>
+                    <h2>{{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.due_amount)}}</h2>
+                    <span class="quote-approval-badge"
+                      *ngIf="quotationDetails.quote_status !== 'Approved' && quotationDetails.quote_status !== 'Rejected' && quotationDetails.quote_status !== 'Ordered'">Awaiting
+                      Approval</span>
+                    <span class="quote-rejected-badge" *ngIf="quotationDetails.quote_status === 'Rejected'">
+                      Rejected
+                    </span>
+                    <span class="payment-not-done-badge"
+                      *ngIf="(quotationDetails.due_amount !== 0 && quotationDetails.quote_status === 'Approved') && !checkpaymentLog()">
+                      Payment not done
+                    </span>
+                    <span class="payment-partial-badge"
+                      *ngIf="quotationDetails.due_amount !== 0 && (quotationDetails.quote_status === 'Approved' || quotationDetails.quote_status === 'Ordered') && checkpaymentLog()">
+                      Partialy paid
+                    </span>
+                    <span class="payment-fully-badge"
+                      *ngIf="quotationDetails.due_amount === 0 &&( quotationDetails.quote_status === 'Approved' || quotationDetails.quote_status === 'Ordered')">
+                      Full paid
+                    </span>
+                    <span class="payment-not-done-badge"
+                      *ngIf="(convertTwoDescimal(quotationDetails.due_amount) === convertTwoDescimal(quotationDetails.quote_total) && quotationDetails.quote_status === 'Ordered' && quotationDetails.payment_log.length === 0)">
+                      Payment not done
+                    </span>
+                  </td>
+                </tr>
+              </table>
+              <!-- Order Item List -->
+              <table class="table table-bordered table-striped">
+                <thead>
+                  <tr>
+                    <th colspan="2" style="font-weight:400; white-space:nowrap;">
+                      Product Name
+                    </th>
+                    <th style="font-weight:400; white-space:nowrap;">
+                      Product Details
+                    </th>
+                    <th width="100" style="font-weight:400; white-space:nowrap;">
+                      Unit Price
+                    </th>
+                    <th width="100" style="font-weight:400; white-space:nowrap;">
+                      Total Qty
+                    </th>
+                    <th width="100" style="font-weight:400; white-space:nowrap;">
+                      Design Cost
+                    </th>
+                    <th width="100" style="font-weight:400; white-space:nowrap;">
+                      Total Price
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let item of lineItemArray ; let index = index">
+                    <ng-container *ngIf="item.isProductAvailable">
+                      <td>{{index + 1}}</td>
+                      <td>{{item.name}}</td>
+                      <td>
+                        <span *ngIf="item.isSimpleProduct">
+                          Simple Product
+                        </span>
+                        <span *ngIf="!item.isSimpleProduct">
+                          <div *ngFor="let variant of item.product_variants">
+                            (<span *ngFor="let attr of variant.attributeList">
+                              {{attr.varinat_name}} /
+                            </span>
+                            <span>
+                              {{variant.quantity}}
+                            </span>
+                            )
+                          </div>
+                        </span>
+                      </td>
+                      <!-- <td>{{globalSettings.currency}}{{convertTwoDescimal(item.unit_price)}}</td> -->
+                      <td>
+                        <div *ngFor="let variant of item.product_variants">
+                          {{globalSettings.currency}}{{convertTwoDescimal(variant.unit_price)}}
+                        </div>
+                      </td>
+                      <td>{{item.qty}}</td>
+                      <td>{{globalSettings.currency}}{{convertTwoDescimal(item.design_price)}}</td>
+                      <td>{{globalSettings.currency}}{{convertTwoDescimal(item.total_amount)}}</td>
+                    </ng-container>
+                    <ng-container *ngIf="!item.isProductAvailable">
+                      <td class="text-center" colspan="7">
+                        No product available. The product might be deleted or removed from the store.
+                      </td>
+                    </ng-container>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- Note & Pricing -->
+              <table style="width: 100%; margin-top: 30px;">
+                <tr>
+                  <td style="vertical-align: top;">
+                    <h5 style="font-size: 14px;">Note to Recipient / Terms & Conditions</h5>
+                    <p>
+                      {{quotationDetails.note}}
+                    </p>
+                  </td>
+                  <td style="width: 50%; text-align: right;vertical-align: top;">
+                    <table style="border: 1px solid #e3e3e3; width: 100%;">
+                      <tr>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          Subtotal
+                        </td>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          <strong>
+                            {{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.design_total)}}
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          Discount({{quotationDetails.discount_type === 'flat' ? 'Flat' : quotationDetails.discount_amount + '%'}})
+                        </td>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          <strong>
+                            <span *ngIf="quotationDetails.discount_type === 'flat'">
+                              {{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.discount_amount)}}
+                            </span>
+                            <span *ngIf="quotationDetails.discount_type !== 'flat'">
+                              {{globalSettings.currency}}{{convertPercentageAmount('discount')}}
+                            </span>
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          Shipping({{quotationDetails.shipping_type}})
+                        </td>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          <strong>
+                            {{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.shipping_amount)}}
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr *ngIf="quotationDetails.is_rush">
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          Rush({{quotationDetails.rush_type === 'flat' ? 'Flat' : quotationDetails.rush_amount +'%'}})
+                        </td>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          <strong>
+                            <span *ngIf="quotationDetails.rush_type === 'flat'">
+                              {{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.rush_amount)}}
+                            </span>
+                            <span *ngIf="quotationDetails.rush_type !== 'flat'">
+                              {{globalSettings.currency}}{{convertPercentageAmount('rush')}}
+                            </span>
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          Tax(%)
+                        </td>
+                        <td style="
+                              padding: 6px 10px;
+                              border: 1px solid #e3e3e3;
+                              text-align: right;
+                            ">
+                          <strong>
+                            {{globalSettings.currency}}{{convertPercentageAmount('tax')}}
+                          </strong>
+                        </td>
+                      </tr>
+                    </table>
+                    <table style="width: 100%;">
+                      <tr>
+                        <td style="padding: 6px 10px; text-align: right;">
+                          Total
+                        </td>
+                        <td style="
+                              padding: 6px 10px;
+                              text-align: right;
+                              font-size: 20px;
+                              width: 172px;
+                            ">
+                          <strong>
+                            {{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.quote_total)}}
+                          </strong>
+                        </td>
+                      </tr>
+                      <tr *ngIf="quotationDetails.payment_log.length > 0">
+                        <td style="padding: 6px 10px; text-align: right;">
+                          Paid
+                        </td>
+                        <td style="
+                              padding: 6px 10px;
+                              text-align: right;
+                              font-size: 20px;
+                              width: 172px;
+                            ">
+                          <strong>
+                            {{globalSettings.currency}}{{getTotalPaidAmount()}}
+                          </strong>
+                        </td>
+                      </tr>
+                    </table>
+                    <small>
+                      (All prices are shown in {{globalSettings.post_fix ? globalSettings.post_fix : 'USD'}})
+                    </small>
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <!-- Order details end -->
+
+            <!-- Order-Items details start -->
+            <ngx-content-loading *ngIf="lineItemLoader" [speed]="'1000ms'" [width]="1110" [height]="400"
+              [primaryColor]="'#f1eff1'" [secondaryColor]="'#dbd6d6'">
+              <svg:g ngx-rect width="1100" height="400" y="10" x="0" rx="10" ry="10"></svg:g>
+            </ngx-content-loading>
+            <div class="canvasWrap" *ngIf="!lineItemLoader && lineItemArray.length">
+              <section>
+                <ng-container *ngFor="let product of lineItemArray; let last= last ; let index = index">
+                  <ng-container *ngIf="!product.isProductAvailable">
+                    <div class="alert alert-danger">
+                      No product available. The product might be deleted or removed from the store.
+                    </div>
+                  </ng-container>
+                  <ng-container *ngIf="product.isProductAvailable">
+                  <table style="width: 100%;">
+                    <tr>
+                      <td colspan="2">
+                        <h3 class="title mb-4">Order item #{{index + 1}}</h3>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="vertical-align: top;">
+                        <table>
+                          <tr>
+                            <td style="padding: 5px;">
+                              <figure style="width: 410px; margin: 0;">
+                                <img [attr.src]='product.image' style="width: 100%;" alt="" />
+                              </figure>
+                            </td>
+                            <td style="vertical-align: top; padding-left: 40px; width: 100%;">
+                              <h3 style="font-size: 18px; margin-bottom: 20px;" class="text-capitalize">
+                                {{product.name}}
+                              </h3>
+                              <!------------SHOWING VARIANT FULLL WIDTH VIEW------------->
+                              <table style="border: 1px solid #e3e3e3; width: 100%;" *ngIf="!product.isSimpleProduct">
+                                <tbody>
+                                  <tr>
+                                    <th style="
+                                        border: 1px solid #d3d3d3;
+                                        background-color: #eee;
+                                        text-align: center;
+                                      ">#</th>
+                                    <th class="text-center" width="20%" style="
+                                    border: 1px solid #d3d3d3;
+                                    background-color: #eee;
+                                    text-align: center;
+                                  " *ngFor="let attr of product.attributeList">
+                                      {{attr.attribut_name}}
+                                    </th>
+                                    <th style="
+                                        border: 1px solid #d3d3d3;
+                                        background-color: #eee;
+                                        text-align: center;
+                                      ">
+                                      Quantity
+                                    </th>
+                                    <th style="
+                                        border: 1px solid #d3d3d3;
+                                        background-color: #eee;
+                                        text-align: center;
+                                      ">
+                                      Price
+                                    </th>
+                                  </tr>
+                                  <ng-container *ngFor="let variant of product.product_variants; let pIndex = index">
+                                    <tr>
+                                      <td style=" padding: 6px 10px;
+                                      border: 1px solid #e3e3e3;
+                                      text-align: center;">
+                                        {{pIndex+1}}
+                                      </td>
+                                      <td style="
+                                        padding: 6px 10px;
+                                        border: 1px solid #e3e3e3;
+                                        text-align: center;
+                                      " *ngFor="let attr of variant.attributeList">
+                                        {{attr.varinat_name}}
+                                      </td>
+                                      <td style="
+                                          padding: 6px 10px;
+                                          border: 1px solid #e3e3e3;
+                                          text-align: center;
+                                        ">
+                                        {{variant.quantity}}
+                                      </td>
+                                      <td style="
+                                          padding: 6px 10px;
+                                          border: 1px solid #e3e3e3;
+                                          text-align: center;
+                                        ">
+                                        {{globalSettings.currency}}{{variant.unit_price}}
+                                      </td>
+                                    </tr>
+                                  </ng-container>
+                                </tbody>
+                              </table>
+                              <!--------------------------------------------------------->
+                              <!------------SHOWING VARIANT HALF WIDTH VIEW-------------->
+                              <table style="border: 1px solid #e3e3e3;" [hidden]="true"
+                                *ngIf="!product.isSimpleProduct">
+                                <ng-container *ngFor="let variant of product.product_variants">
+                                  <tr *ngIf="product.isColor">
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      Color
+                                    </td>
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      {{variant.attribute.Color.name}}
+                                    </td>
+                                  </tr>
+                                  <tr *ngIf="product.isSize">
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      Size
+                                    </td>
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      {{variant.attribute.Size.name}}
+                                    </td>
+                                  </tr>
+                                  <tr *ngIf="product.isMaterial">
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      Material
+                                    </td>
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      {{variant.attribute.Material.name}}
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      Price
+                                    </td>
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      {{globalSettings.currency}}{{variant.unit_price}}
+                                    </td>
+                                  </tr>
+                                </ng-container>
+                              </table>
+                              <table style="border: 1px solid #e3e3e3; width: 100%;" *ngIf="product.isSimpleProduct">
+                                <tr>
+                                  <th style=" 
+                                      border: 1px solid #d3d3d3;
+                                      background-color: #eee;
+                                      text-align: center;">
+                                    Product Type
+                                  </th>
+                                  <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                    Simple Product
+                                  </td>
+                                </tr>
+                                <ng-container *ngFor="let variant of product.product_variants">
+                                  <tr>
+                                    <th style="
+                                          border: 1px solid #d3d3d3;
+                                          background-color: #eee;
+                                          text-align: center;
+                                        ">
+                                      Quantity
+                                    </th>
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      {{variant.quantity}}
+                                    </td>
+                                  <tr>
+                                    <th style="
+                                          border: 1px solid #d3d3d3;
+                                          background-color: #eee;
+                                          text-align: center;
+                                        ">
+                                      Price
+                                    </th>
+                                    <td style="padding: 6px 10px; border: 1px solid #e3e3e3;">
+                                      {{globalSettings.currency}}{{variant.unit_price}}
+                                    </td>
+                                  </tr>
+                                </ng-container>
+                              </table>
+                              <!---------------------------------------------------------->
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr *ngIf="product.uploadDesigns.length">
+                      <td colspan="2">
+                        <h4 style="font-size: 16px; margin-top: 20px;">
+                          Artwork used
+                        </h4>
+                        <table style="width: 100%; border: 1px solid #e3e3e3;">
+                          <tr *ngFor="let file of product.uploadDesigns; let uploadIndex = index">
+                            <td style="padding: 12px; border: 1px solid #e3e3e3;"
+                              [class.hidden]="file.decoration_area.length === 0">
+                              <table *ngFor="let item of file.decoration_area ; let imgIndex = index">
+                                <tr>
+                                  <td style="vertical-align: top;" class="text-center">
+                                    <h5>Preview</h5>
+                                    <figure style="margin:0;width:150px;height:150px;" class="cursor-pointer"
+                                      data-target="#image_pop_up" data-toggle="modal"
+                                      (click)="preViewImageSetUp(item.upload_preview_url,false)">
+                                      <img [attr.src]="item.upload_preview_url" alt=""
+                                        style="width:150px;height:150px;object-fit:contain;" />
+                                    </figure>
+                                  </td>
+                                  <td style="vertical-align: top;" class="text-center">
+                                    <h5>Design</h5>
+                                    <figure style="margin:0;width:150px;height:150px;" class="cursor-pointer"
+                                      data-target="#image_pop_up" data-toggle="modal"
+                                      (click)="preViewImageSetUp(item.upload_design_url, file.formSvg)">
+                                      <img [attr.src]="item.upload_design_url" *ngIf="!file.formSvg" alt=""
+                                        style="width:150px;height:150px;object-fit:contain;" />
+                                      <div class="svgNew" [class.hidden]="!file.formSvg"
+                                        id="form-{{index}}-{{uploadIndex}}-{{imgIndex}}">
+                                      </div>
+                                    </figure>
+                                  </td>
+                                  <td style="vertical-align: top;">
+                                    <table>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          View
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>{{file.side_name}}</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Area
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>{{item.print_area_name}}</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Print method
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>{{item.print_methods}}</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Name
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>{{item.decoration_area}}</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Width
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>{{item.width + ' ' + item.measurement_unit}}</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Height
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>{{item.height + ' ' + item.measurement_unit}}</strong>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                  <hr *ngIf="!last" style="
+                      border-top: 2px dashed rgba(0, 0, 0, 0.15);
+                      margin: 60px 0;
+                    " />
+                  </ng-container>
+                </ng-container>
+                <!-- <table style="width: 100%;">
+                    <tr>
+                      <td colspan="2">
+                        <h3 class="title mb-4">Order item #1</h3>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="vertical-align: top;">
+                        <table>
+                          <tr>
+                            <td style="padding: 5px;">
+                              <figure style="width: 410px; margin: 0;">
+                                <img
+                                  src="assets/images/product.jpg"
+                                  style="width: 100%;"
+                                  alt=""
+                                />
+                              </figure>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                      <td style="vertical-align: top; padding-left: 40px;">
+                        <h3 style="font-size: 18px; margin-bottom: 20px;">
+                          5000 - Heavy cotton TM 100% Cotton T Shirt
+                        </h3>
+                        <table style="border: 1px solid #e3e3e3;">
+                          <tr>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              Material
+                            </td>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              100% Cotton (preshrunk)
+                            </td>
+                          </tr>
+                          <tr>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              Price
+                            </td>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              $50.00 USD
+                            </td>
+                          </tr>
+                        </table>
+                        <h4 style="font-size: 16px; margin-top: 20px;">
+                          Product Description
+                        </h4>
+                        <p>
+                          100% cotton (heather gray and heather ice blue are 95%
+                          cotton /5% viscose. Heather blue & charcoal gray are 80%
+                          cotton/20% polyester. Heather burgundy is 60% cotton/40%
+                          polyester. Heather oatmeal is 99% cotton/1% viscose) |
+                          Fabric Weight: 4.42 oz (lightweight)
+                        </p>
+                        <p>
+                          Wide range of sizes from S-5XL
+                        </p>
+                        <p>
+                          Fairly produced, certified and triple audited.
+                        </p>
+                        <p>
+                          Double stitched, reinforced seams at shoulder, sleeve,
+                          collar and waist
+                        </p>
+                        <p>
+                          Optimized for beautiful brilliance across all printing
+                          methods
+                        </p>
+                        <h4 style="font-size: 16px; margin-top: 20px;">
+                          Size Chart
+                        </h4>
+                        <table style="border: 1px solid #e3e3e3; width: 100%;">
+                          <tr>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            ></th>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            >
+                              Small
+                            </th>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            >
+                              Medium
+                            </th>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            >
+                              Large
+                            </th>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            >
+                              X-Large
+                            </th>
+                          </tr>
+                          <tr>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              Height
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              12
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              26
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              8
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              3
+                            </td>
+                          </tr>
+                          <tr>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              Width
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              12
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              26
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              8
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              3
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
+                        <h4 style="font-size: 16px; margin-top: 20px;">
+                          Artwork used
+                        </h4>
+                        <table style="width: 100%; border: 1px solid #e3e3e3;">
+                          <tr>
+                            <td style="padding: 12px; border: 1px solid #e3e3e3;">
+                              <table>
+                                <tr>
+                                  <td style="vertical-align: top;">
+                                    <figure style="margin: 0;">
+                                      <img src="assets/images/artwork.png" alt="" />
+                                    </figure>
+                                  </td>
+                                  <td style="vertical-align: top;">
+                                    <table>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          View
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Front</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Area
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Body</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Process
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Sublimation</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Name
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Alex</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Width
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>11.93 cm</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Height
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>4.85 cm</strong>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table>
+                  <hr
+                    style="
+                      border-top: 2px dashed rgba(0, 0, 0, 0.15);
+                      margin: 60px 0;
+                    "
+                  />
+                  <table style="width: 100%;">
+                    <tr>
+                      <td colspan="2">
+                        <h3 class="title mb-4">Order item #2</h3>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td style="vertical-align: top;">
+                        <table>
+                          <tr>
+                            <td style="padding: 5px;">
+                              <figure style="width: 200px; margin: 0;">
+                                <img
+                                  src="assets/images/product.jpg"
+                                  style="width: 100%;"
+                                  alt=""
+                                />
+                              </figure>
+                            </td>
+                            <td style="padding: 5px;">
+                              <figure style="width: 200px; margin: 0;">
+                                <img
+                                  src="assets/images/product.jpg"
+                                  style="width: 100%;"
+                                  alt=""
+                                />
+                              </figure>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 5px;">
+                              <figure style="width: 200px; margin: 0;">
+                                <img
+                                  src="assets/images/product.jpg"
+                                  style="width: 100%;"
+                                  alt=""
+                                />
+                              </figure>
+                            </td>
+                            <td style="padding: 5px;">
+                              <figure style="width: 200px; margin: 0;">
+                                <img
+                                  src="assets/images/product.jpg"
+                                  style="width: 100%;"
+                                  alt=""
+                                />
+                              </figure>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                      <td style="vertical-align: top; padding-left: 40px;">
+                        <h3 style="font-size: 18px; margin-bottom: 20px;">
+                          5000 - Heavy cotton TM 100% Cotton T Shirt
+                        </h3>
+                        <table style="border: 1px solid #e3e3e3;">
+                          <tr>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              Material
+                            </td>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              100% Cotton (preshrunk)
+                            </td>
+                          </tr>
+                          <tr>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              Price
+                            </td>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              $50.00 USD
+                            </td>
+                          </tr>
+                        </table>
+                        <h4 style="font-size: 16px; margin-top: 20px;">
+                          Product Description
+                        </h4>
+                        <p>
+                          100% cotton (heather gray and heather ice blue are 95%
+                          cotton /5% viscose. Heather blue & charcoal gray are 80%
+                          cotton/20% polyester. Heather burgundy is 60% cotton/40%
+                          polyester. Heather oatmeal is 99% cotton/1% viscose) |
+                          Fabric Weight: 4.42 oz (lightweight)
+                        </p>
+                        <p>
+                          Wide range of sizes from S-5XL
+                        </p>
+                        <p>
+                          Fairly produced, certified and triple audited.
+                        </p>
+                        <p>
+                          Double stitched, reinforced seams at shoulder, sleeve,
+                          collar and waist
+                        </p>
+                        <p>
+                          Optimized for beautiful brilliance across all printing
+                          methods
+                        </p>
+                        <h4 style="font-size: 16px; margin-top: 20px;">
+                          Size Chart
+                        </h4>
+                        <table style="border: 1px solid #e3e3e3; width: 100%;">
+                          <tr>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            ></th>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            >
+                              Small
+                            </th>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            >
+                              Medium
+                            </th>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            >
+                              Large
+                            </th>
+                            <th
+                              style="
+                                border: 1px solid #d3d3d3;
+                                background-color: #eee;
+                                text-align: center;
+                              "
+                            >
+                              X-Large
+                            </th>
+                          </tr>
+                          <tr>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              Height
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              12
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              26
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              8
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              3
+                            </td>
+                          </tr>
+                          <tr>
+                            <td
+                              style="padding: 6px 10px; border: 1px solid #e3e3e3;"
+                            >
+                              Width
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              12
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              26
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              8
+                            </td>
+                            <td
+                              style="
+                                padding: 6px 10px;
+                                border: 1px solid #e3e3e3;
+                                text-align: center;
+                              "
+                            >
+                              3
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colspan="2">
+                        <h4 style="font-size: 16px; margin-top: 20px;">
+                          Artwork used
+                        </h4>
+                        <table style="width: 100%; border: 1px solid #e3e3e3;">
+                          <tr>
+                            <td style="padding: 12px; border: 1px solid #e3e3e3;">
+                              <table>
+                                <tr>
+                                  <td style="vertical-align: top;">
+                                    <figure style="margin: 0;">
+                                      <img src="assets/images/artwork.png" alt="" />
+                                    </figure>
+                                  </td>
+                                  <td style="vertical-align: top;">
+                                    <table>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          View
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Front</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Area
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Body</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Process
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Sublimation</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Name
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Alex</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Width
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>11.93 cm</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Height
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>4.85 cm</strong>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #e3e3e3;">
+                              <table>
+                                <tr>
+                                  <td style="vertical-align: top;">
+                                    <figure style="margin: 0;">
+                                      <img src="assets/images/artwork.png" alt="" />
+                                    </figure>
+                                  </td>
+                                  <td style="vertical-align: top;">
+                                    <table>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          View
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Front</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Area
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Body</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Process
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Sublimation</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Name
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Alex</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Width
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>11.93 cm</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Height
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>4.85 cm</strong>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td style="padding: 12px; border: 1px solid #e3e3e3;">
+                              <table>
+                                <tr>
+                                  <td style="vertical-align: top;">
+                                    <figure style="margin: 0;">
+                                      <img src="assets/images/artwork.png" alt="" />
+                                    </figure>
+                                  </td>
+                                  <td style="vertical-align: top;">
+                                    <table>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          View
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Front</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Area
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Body</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Process
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Sublimation</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Name
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Alex</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Width
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>11.93 cm</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Height
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>4.85 cm</strong>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                            <td style="padding: 12px; border: 1px solid #e3e3e3;">
+                              <table>
+                                <tr>
+                                  <td style="vertical-align: top;">
+                                    <figure style="margin: 0;">
+                                      <img src="assets/images/artwork.png" alt="" />
+
+                                    </figure>
+                                  </td>
+                                  <td style="vertical-align: top;">
+                                    <table>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          View
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Front</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+          
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Area
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Body</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Process
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Sublimation</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Name
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>Alex</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Width
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>11.93 cm</strong>
+                                        </td>
+                                      </tr>
+                                      <tr>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          Height
+                                        </td>
+                                        <td style="padding: 0 0px 4px 20px;">
+                                          <strong>4.85 cm</strong>
+                                        </td>
+                                      </tr>
+                                    </table>
+                                  </td>
+                                </tr>
+                              </table>
+                            </td>
+                          </tr>
+                        </table>
+                      </td>
+                    </tr>
+                  </table> -->
+              </section>
+            </div>
+            <!-- Order-Items details end -->
+          </div>
+        </ng-container>
+
+        <!-- Payment section -->
+        <ng-container *ngIf="makePaymentForm">
+          <div id="payment" class="canvasWrap">
+            <button class="tex-right pull-right btn btn-sm btn-dark" [disabled]="paymentLoader"
+              (click)="backToPayment()">
+              <i class="fa fa-arrow-left"> Back to payment</i>
+            </button>
+            <div class="priceWrap">
+              <h3 class="title">Make a Payment</h3>
+              <div class="row justify-content-center">
+                <div class="col-auto" *ngIf="quotationDetails.request_payment !== 0">
+                  <div class="card p-3">
+                    <div class="custom-control custom-radio custom-control-inline curse">
+                      <input type="radio" id="customRadioInline1" name="customRadioInline1" class="custom-control-input"
+                        [attr.value]="quotationDetails.request_payment" (change)="setPayment($event.target.value)">
+                      <label class="custom-control-label cursor-pointer" for="customRadioInline1">
+                        <span class="title">Requested payment amount</span>
+                        <span
+                          class="amount">{{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.request_payment)}}</span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-auto">
+                  <div class="card p-3">
+                    <div class="custom-control custom-radio custom-control-inline curse">
+                      <input type="radio" id="customRadioInline2" name="customRadioInline1"
+                        (change)="setPayment($event.target.value)" checked class="custom-control-input"
+                        [attr.value]="quotationDetails.due_amount" />
+                      <label class="custom-control-label cursor-pointer" for="customRadioInline2">
+                        <span class="title">Pay full amount</span>
+                        <span
+                          class="amount">{{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.due_amount)}}</span></label>
+                    </div>
+                  </div>
+                </div>
+                <!-- <div class="col-auto">
+                  <div class="card p-3">
+                    <div class="custom-control custom-radio custom-control-inline">
+                      <input type="radio" id="customRadioInline3" name="customRadioInline1"
+                        class="custom-control-input" />
+                      <label class="custom-control-label" for="customRadioInline3">
+                        <span class="title">Pay custom amount</span></label>
+                    </div>
+                    <input type="text" class="form-control form-control-sm" />
+                  </div>
+                </div> -->
+              </div>
+              <div class="row justify-content-center mt-5">
+                <div class="col-4">
+                  <div class="form-group">
+                    <label for="">Choose a payment method</label>
+                    <select class="form-control" [(ngModel)]="paymentMethod">
+                      <option value="paypal" selected>
+                        Paypal
+                      </option>
+                      <!-- <option value="stripe">
+                        Stripe
+                      </option> -->
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="btns">
+                <div class="btn btn-primary btn-lg next action-button" (click)="confirmPayment()"
+                  [class.disabled]="paymentLoader">
+                  <i class="fa fa-spinner fa-spin" *ngIf="paymentLoader">
+                  </i>
+                  Confirm Payment
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+
+        <!-- Thank you section -->
+        <ng-container *ngIf="paymentSuccess">
+          <div id="complete" class="canvasWrap">
+            <div class="thank-you">
+              <div class="iconBox">
+                <i class="tick-icon rounded"></i>
+              </div>
+              <h3 class="title">Payment Successful</h3>
+              <h5 class="sub-title mb-5">Your payment has been processed!</h5>
+              <div class="btns">
+                <button type="button" class="btn btn-dark btn-lg" (click)="hideSuccessModal()">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="paymentFailure">
+          <div id="complete" class="canvasWrap">
+            <div class="thank-you p-0">
+              <div class="f-modal-alert">
+                <div class="f-modal-icon f-modal-error animate">
+                  <span class="f-modal-x-mark">
+                    <span class="f-modal-line f-modal-left animateXLeft"></span>
+                    <span class="f-modal-line f-modal-right animateXRight"></span>
+                  </span>
+                  <div class="f-modal-placeholder"></div>
+                  <div class="f-modal-fix"></div>
+                </div>
+              </div>
+              <h3 class="title">Payment Failed</h3>
+              <h5 class="sub-title mb-5">Your payment has been failed !</h5>
+              <div class="btns">
+                <button type="button" class="btn btn-dark btn-lg" (click)="hideFaileModal()">
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+    </div>
+
+    <!-- <ng-container *ngIf="makePaymentForm">
+      <div class="dt-elements dt-canvas">
+        <div class="canvasWrap mb-4">
+          <h4 class="alert-heading text-center">Make a Payment</h4>
+          <p class="alert-subheading mb-0 text-center">
+            Choose the payment method to make the payment
+          </p>
+          <div class="row mt-4">
+            <div class="col-4"></div>
+            <div class="col-4">
+              <div class="card-body custom-payment-card">
+                <h5>
+                  Pay full amount
+                </h5>
+                <h3>
+                  <strong>{{globalSettings.currency}}{{convertTwoDescimal(quotationDetails.due_amount)}}</strong>
+                </h3>
+              </div>
+            </div>
+            <div class="col-4"></div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-3"></div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="payment_method" class="text-center">
+                  Choose payment method
+                </label>
+                <select class="custom-select custom-form-control" [(ngModel)]="paymentMethod">
+                  <option value="paypal" selected>
+                    Paypal
+                  </option>
+                  <option value="stripe">
+                    Stripe
+                  </option>
+                </select>
+              </div>
+
+              <div class="alert-btns text-center mt-2">
+                <div class="btn btn-lg btn-primary next action-button" (click)="confirmPayment()">
+                  Confirm Payment <i class="fa fa-arrow-right"></i>
+                </div>
+              </div>
+            </div>
+            <div class="col-3"></div>
+          </div>
+        </div>
+      </div>
+    </ng-container> -->
+
+    <!-- <ng-container *ngIf="paymentSuccess">
+      <div class="dt-elements dt-canvas">
+        <div class="canvasWrap mb-4">
+          <div class="modalbox success col-sm-8 col-md-6 col-lg-5 center animate">
+            <div class="icon">
+              <i class="fa fa-check-circle"></i>
+            </div>
+            <h1>Success!</h1>
+            <p>We've sent a confirmation to your e-mail
+              <br>for verification.</p>
+            <button type="button" class="redo btn btn-info" (click)="hideSuccessModal()">Close</button>
+          </div>
+        </div>
+      </div>
+    </ng-container> -->
+  </div>
+</div>
+<!-- Footer -->
+<div class="container" [hidden]="!isAllowShowView">
+  <div class="row">
+    <div class="col-12 text-right pb-5">
+      All copyrights reserved to ImprintNext
+    </div>
+  </div>
+</div>
+
+<!-- Feedback Modal -->
+<div class="modal custom-modal right fade" id="filter" tabindex="-1" role="dialog" aria-labelledby="myModalLabel2"
+  *ngIf="!quoteDetailsLoader">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">×</span>
+        </button>
+        <h4 class="modal-title" id="myModalLabel2">Conversations</h4>
+      </div>
+      <div class="modal-body">
+        <div class="chat">
+          <div class="chat-history">
+            <div class="alert laert-info text-center" *ngIf="conversationList.length === 0 && !conversationLoader">
+              You have not started any conversation till now.
+            </div>
+            <ul>
+              <li class="clearfix">
+                <ngx-content-loading *ngIf="conversationLoader" [speed]="'1000ms'" [width]="345" [height]="400"
+                  [primaryColor]="'#f1eff1'" [secondaryColor]="'#dbd6d6'">
+                  <svg:g ngx-rect width="300" height="100" y="10" x="40" rx="15" ry="15"></svg:g>
+
+                  <svg:g ngx-rect width="300" height="100" y="150" x="0" rx="15" ry="15"></svg:g>
+
+                  <svg:g ngx-rect width="300" height="100" y="300" x="40" rx="15" ry="15"></svg:g>
+                </ngx-content-loading>
+              </li>
+            </ul>
+            <ul *ngIf="conversationList.length > 0 && !conversationLoader">
+              <ng-container *ngFor="let item of conversationList">
+                <ng-container *ngIf="item.user_type !== 'customer'">
+                  <li>
+                    <div class="message-data">
+                      <span class="message-data-name text-capitalize"><i class="fa fa-circle online"></i>
+                        {{item.user_type ? item.user_type : 'Admin'}}
+                      </span>
+                      <span class="message-data-time">
+                        {{item.created_date | dateTimeFilter: "h:mm:ss a [,] D-MM-YYYY"}}
+                      </span>
+                    </div>
+                    <div class="message my-message">
+                      {{item.message}}
+                      <br>
+                      <div class="imgBoxWrap download" *ngIf="item.files && item.files.length > 0">
+                        <div class="imgBox mb-3" *ngFor="let fileItem of item.files">
+                          <a href="javascript:;" (click)="downloadClickedFile(fileItem.file_name)">
+                            <figure>
+                              <img *ngIf="fileItem.thumbnail !== ''" [src]="fileItem.thumbnail">
+                              <span class="imgEdit"><i class="fa fa-cloud-download"></i></span>
+                            </figure>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ng-container>
+                <ng-container *ngIf="item.user_type === 'customer'">
+                  <li class="clearfix">
+                    <div class="message-data align-right">
+                      <span
+                        class="message-data-time">{{item.created_date | dateTimeFilter: "h:mm:ss a [,] D-MM-YYYY"}}</span>
+                      &nbsp; &nbsp; <span class="message-data-name">
+                        {{quotationDetails.customer.name ? quotationDetails.customer.name : quotationDetails.customer.email}}
+                      </span>
+                      <i class="fa fa-circle me"></i>
+                    </div>
+                    <div class="message other-message float-right">
+                      {{item.message}}
+                      <br>
+                      <div class="imgBoxWrap download mb-3" *ngIf="item.files && item.files.length > 0">
+                        <div class="imgBox" *ngFor="let fileItem of item.files">
+                          <a href="javascript:;" (click)="downloadClickedFile(fileItem.file_name)">
+                            <figure>
+                              <img *ngIf="fileItem.thumbnail !== ''" [src]="fileItem.thumbnail">
+                              <span class="imgEdit"><i class="fa fa-cloud-download"></i></span>
+                            </figure>
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ng-container>
+              </ng-container>
+            </ul>
+          </div>
+          <div class="chat-message clearfix">
+            <textarea name="message-to-send" id="message-to-send" [(ngModel)]="conversationObj.message"
+              placeholder="Type your message" rows="3"></textarea>
+            <button class="btn btn-primary  pull-right" [disabled]="checkButtonStatus()" (click)="sendMessage()">
+              <i class="fa fa-send" *ngIf="!chatLoader"></i>
+              <i class="fa fa-spinner fa-spin" *ngIf="chatLoader"></i>
+              Send</button>
+            <button class="btn btn-dark  pull-right mr-2" (click)="attachConversationFile()">
+              <i class="fa fa-link"></i> Attach File</button>
+            <input type='file' multiple class="hidden" accept=".png,.svg,.jpg,.jpeg,.zip,.pdf" id="conver_file_upload"
+              (change)="handelFileUploadChange($event)">
+            <span class="text-danger" *ngIf="isInvalidFile">Invalid file format.</span><br>
+            <span class="text-dark" *ngIf="selectedFile > 0">{{selectedFile}} Files Selected.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Feedback Modal -->
+
+<!------------ Quote Reject Modal ------------>
+<div class="modal fade" id="quote_reject_modal" tabindex="-1" role="dialog" #quoteRejectEle
+  aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalScrollableTitle">Reject Quotation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <textarea class="form-control" [(ngModel)]="rejectMessage.message" rows="6"
+          placeholder="Enter the reason for reject the quotation."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger btn-sm" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-success btn-sm" [disabled]="!rejectMessage.message || rejectMessage.loader"
+          (click)="rejectQuoteOrder()"><i class="fa fa-refresh fa-spin" *ngIf="rejectMessage.loader"></i> Reject
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Image pop up-->
+<div class="modal fade" id="image_pop_up" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable modal-dialog-centered fullMaxWidth" role="document">
+    <div class="modal-content scroll-bar-wrap">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalScrollableTitle">
+          Artwork designs
+        </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body scroll-box">
+        <div class="container">
+          <div class="m-t-10 image-view q-r-img-model-img">
+            <img class="img-responsive m-auto" *ngIf="preViewArtworkImage" [attr.src]="transform(preViewArtworkImage)">
+            <!-- <div class="svgNew" [class.hidden]="preViewArtworkImage" id="singl-svg-shower"></div> -->
+            <iframe class="svgNew" [class.d-none]="preViewArtworkImage" id="singl-svg-shower"></iframe>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<notifier-container></notifier-container>

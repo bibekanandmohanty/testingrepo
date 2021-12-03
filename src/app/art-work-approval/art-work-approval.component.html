@@ -1,0 +1,385 @@
+
+<div class="page-container  scroll-bar-wrap p-0">
+  <div class="page-content-wrapper scroll-box" id="scrollBar">
+      <div class="content">
+          <div class="container">
+            <div class="dashContentWrap">
+              <div class="dashHeader borderBottom mb-3"  >
+                <div class="dashCol" *ngIf="orderDetailsData === undefined">
+                  <ngx-content-loading
+                      [speed]="'800ms'"
+                      [width]="1108"
+                      [height]="35"
+                      [primaryColor]="'#f1eff1'"
+                              [secondaryColor]="'#f8f8f8'">
+                      <svg:g ngx-rect width="1108" height="35" y="5" x="0" rx="5" ry="5"></svg:g>
+                  </ngx-content-loading>
+                </div>
+                <div class="dashCol" *ngIf="orderDetailsData !== undefined">
+                  <div class="pageTitle align_center">Order #{{selectedOrderId}}
+                    <span class="statusBox ml-2"
+                      [ngClass]="{'statusBox-success': orderDetailsData.status.includes('completed'), 'statusBox-info': orderDetailsData.status.includes('processing'), 'statusBox-warning': orderDetailsData.status.includes('on-hold')}">
+                      {{orderDetailsData.status}}
+                    </span>
+                  </div>
+                </div>
+              </div>
+              <div class="dashContent mb-5" *ngIf="orderLoader">
+                <div class="order-date pb-3">
+                  <ngx-content-loading
+                      [speed]="'800ms'"
+                      [width]="1108"
+                      [height]="35"
+                      [primaryColor]="'#f1eff1'"
+                              [secondaryColor]="'#f8f8f8'">
+                      <svg:g ngx-rect width="1108" height="35" y="5" x="0" rx="5" ry="5"></svg:g>
+                  </ngx-content-loading>
+                </div>
+                <div class="row">
+                  <div class="col-md-3 padding_r_15">
+                    <div class="card wrap">
+                      <ngx-content-loading
+                          [speed]="'800ms'"
+                          [width]="255"
+                          [height]="181"
+                          [primaryColor]="'#f1eff1'"
+                              [secondaryColor]="'#f8f8f8'">
+                          <svg:g ngx-rect width="255" height="181" y="5" x="0" rx="5" ry="5"></svg:g>
+                      </ngx-content-loading>
+                    </div>
+                    <div class="card wrap">
+                      <ngx-content-loading
+                          [speed]="'800ms'"
+                          [width]="255"
+                          [height]="60"
+                          [primaryColor]="'#f1eff1'"
+                              [secondaryColor]="'#f8f8f8'">
+                          <svg:g ngx-rect width="255" height="60" y="5" x="0" rx="5" ry="5"></svg:g>
+                      </ngx-content-loading>
+                    </div>
+                    <div class="card wrap p-0 m-0">
+                      <ngx-content-loading
+                          [speed]="'800ms'"
+                          [width]="255"
+                          [height]="265"
+                          [primaryColor]="'#f1eff1'"
+                              [secondaryColor]="'#f8f8f8'">
+                          <svg:g ngx-rect width="255" height="265" y="5" x="0" rx="5" ry="5"></svg:g>
+                      </ngx-content-loading>
+                    </div>
+                  </div>
+                  <div class="col-md-9">
+                    <ngx-content-loading
+                          [speed]="'800ms'"
+                          [width]="855"
+                          [height]="608"
+                          [primaryColor]="'#f1eff1'"
+                              [secondaryColor]="'#f8f8f8'">
+                          <svg:g ngx-rect width="855" height="608" y="5" x="0" rx="5" ry="5"></svg:g>
+                    </ngx-content-loading>
+                  </div>
+                </div>
+              </div>
+              <div class="dashContent mb-5" [hidden]="orderLoader" *ngIf="orderDetailsData !== undefined" >
+                <div class="order-date pb-3"><i class="pg pg-calender"></i>
+                  {{orderDetailsData.created_date | dateTimeFilter:'MMMM Do, YYYY [at] h:mm:ss a'}}</div>
+                <div class="row">
+                  <div class="col-md-3 padding_r_15">
+                    <div class="card wrap">
+                      <div class="detail_list">
+                        <label class="card-title"> Payment </label>
+                        <div class="lister-wrap mt-3">
+                          <div class="lister">
+                            <span> Subtotal </span>
+                            <span>{{orderDetailsData.total_amount.toFixed(2)}} {{orderDetailsData.currency}}</span>
+                          </div>
+                          <div class="lister">
+                            <span>Tax</span>
+                            <span>{{orderDetailsData.total_tax.toFixed(2)}} {{orderDetailsData.currency}}</span>
+                          </div>
+                          <div class="lister">
+                            <span class="bold">Total</span>
+                            <span class="bold">{{(orderDetailsData.total_amount*1 + orderDetailsData.total_tax*1).toFixed(2)}}
+                              {{orderDetailsData.currency}}
+                            </span>
+                          </div>
+                          <hr>
+                          <div class="lister m-0">
+                            <span>Paid by customer</span>
+                            <span>{{(orderDetailsData.total_amount*1 + orderDetailsData.total_tax*1).toFixed(2)}}
+                              {{orderDetailsData.currency}}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <!-- <div class="card wrap">
+                      <div class="detail_list">
+                        <label class="card-title">Notes</label>
+                        <div class="mt-3" *ngIf="orderDetailsData.note !== ''">{{orderDetailsData.note}}</div>
+                        <div class="mt-3" *ngIf="orderDetailsData.note === ''">{{orderDetailsData.customer_first_name}} {{orderDetailsData.customer_last_name}} has not added any note.</div>
+                      </div>
+                    </div> -->
+                    <div class="card wrap p-0 m-0">
+                      <div class="customer-details">
+                        <div class="detail-group">
+                          <label class="card-title">Customer</label>
+                          <div class="cnt mt-2">
+                            <div class="cnt-row">
+                              <div class="btn btn-link p-0" *ngIf="orderDetailsData.customer_id; else guestCustomer">
+                                {{orderDetailsData.customer_first_name}} {{orderDetailsData.customer_last_name}}
+                              </div>
+                              <ng-template #guestCustomer>
+                                <div class="p-0">
+                                  {{orderDetailsData.customer_first_name}} {{orderDetailsData.customer_last_name}}
+                                </div>
+                              </ng-template>
+                            </div>
+                            <div class="cnt-row">{{orderDetailsData.customer_email}}</div>
+                            <div class="cnt-row mt-3">
+                              <div class="btn btn-link p-0" 
+                                *ngIf="orderDetailsData.total_orders > 0; else noOrder">
+                                {{orderDetailsData.total_orders}} Orders
+                              </div>
+                              <ng-template #noOrder>
+                                <div class="p-0">1 Orders</div>
+                              </ng-template>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="detail-group">
+                          <label class="card-title">Shipping address</label>
+                          <div class="cnt mt-2">
+                            <div class="cnt-row"><span
+                              *ngIf="orderDetailsData.shipping.first_name !== ''">{{orderDetailsData.shipping.first_name + ' ' + orderDetailsData.shipping.last_name }},</span></div>
+                            <div class="cnt-row"><span
+                                *ngIf="orderDetailsData.shipping.company !== ''">{{orderDetailsData.shipping.company}},</span></div>
+                            <div class="cnt-row"><span
+                                *ngIf="orderDetailsData.shipping.address_1 !== ''">{{orderDetailsData.shipping.address_1}},</span>
+                              <span
+                                *ngIf="orderDetailsData.shipping.address_2 !== ''">{{orderDetailsData.shipping.address_2}},</span>
+                            </div>
+                            <div class="cnt-row"><span
+                                *ngIf="orderDetailsData.shipping.city !== ''">{{orderDetailsData.shipping.city}},</span>
+                              <span *ngIf="orderDetailsData.shipping.state !== ''">{{orderDetailsData.shipping.state}},</span></div>
+                            <div class="cnt-row"><span
+                                *ngIf="orderDetailsData.shipping.country !== ''">{{orderDetailsData.shipping.country}},</span>
+                              <span *ngIf="orderDetailsData.shipping.postcode !== ''">{{orderDetailsData.shipping.postcode}}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="detail-group">
+                          <label class="card-title">Billing address</label>
+                          <div class="cnt mt-2">
+                            <div class="cnt-row"><span
+                              *ngIf="orderDetailsData.billing.first_name !== ''">{{orderDetailsData.billing.first_name + ' ' + orderDetailsData.billing.last_name }},</span></div>
+                            <div class="cnt-row"><span
+                                *ngIf="orderDetailsData.billing.company !== ''">{{orderDetailsData.billing.company}},</span></div>
+                            <div class="cnt-row"><span
+                                *ngIf="orderDetailsData.billing.address_1 !== ''">{{orderDetailsData.billing.address_1}},</span>
+                              <span *ngIf="orderDetailsData.billing.address_2 !== ''">{{orderDetailsData.billing.address_2}},</span>
+                            </div>
+                            <div class="cnt-row"><span
+                                *ngIf="orderDetailsData.billing.city !== ''">{{orderDetailsData.billing.city}},</span>
+                              <span *ngIf="orderDetailsData.billing.state !== ''">{{orderDetailsData.billing.state}},</span></div>
+                            <div class="cnt-row"><span
+                                *ngIf="orderDetailsData.billing.country !== ''">{{orderDetailsData.billing.country}},</span>
+                              <span *ngIf="orderDetailsData.billing.postcode !== ''">{{orderDetailsData.billing.postcode}}</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-9">
+                    <!-- Sides Start -->
+                    <div class="card customerOrder orderPreview" *ngFor="let orderItemData of orderDetailsData.orders; let index = index">
+                      <div class="card-header">
+                        <div class="card-left">
+                          <h4>{{orderItemData.name}}</h4>
+                          <div class="qty">SKU:<span>{{orderItemData.sku}}</span></div>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <div class="order-detail-view">
+                          <div class="row">
+                            <div class="col-8">
+                              <div class="multi-img-wrap">
+                                <div class="multi-img-box" *ngFor="let imageData of orderItemData.images">
+                                  <figure>
+                                    <img [src]="imageData.thumbnail" />
+                                  </figure>
+                                </div>
+                              </div>
+                            </div>
+                            <!-- <div class="col-2">
+                              <div class="barCode" *ngIf="orderItemData.decoration_settings_data.length > 0">
+                                <img src="http://pngimg.com/uploads/barcode/barcode_PNG26.png" />
+                              </div>
+                            </div> -->
+                            <div class="col-4">
+                              <div class="price-detail">
+                                <div class="price-detail-col">
+                                  <span>{{orderItemData.price.toFixed(2)}} {{orderDetailsData.currency}}</span>
+                                  x <span>{{orderItemData.quantity}}</span>
+                                </div>
+                                <div class="price-detail-col">
+                                  <span><strong>{{orderItemData.total}} {{orderDetailsData.currency}}</strong></span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <!-- decoration settings data -->
+                        <!-- <table class="table table-bordered order-table">
+                          <thead>
+                            <tr>
+                              <th class="text-center" [translate]="'order.product-side'"></th>
+                              <th class="text-center" [translate]="'order.print-method'"></th>
+                              <th class="text-center" [translate]="'order.decoration-area'"></th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr *ngIf="orderItemData.decoration_settings_data.length === 0">
+                              <td class="text-center" colspan="3" [translate]="'order.no-decoration'"></td>
+                            </tr>
+                            <ng-container *ngIf="orderItemData.decoration_settings_data.length !== 0">
+                              <ng-container *ngFor="let decoSettingItem of orderItemData.decoration_settings_data">
+                                <tr *ngFor="let printAreaItem of decoSettingItem.decoration_data">
+                                  <td class="text-center">{{decoSettingItem.name}}</td>
+                                  <td class="text-center">{{printAreaItem.print_profile_name}}</td>
+                                  <td class="text-center">{{printAreaItem.print_area_name}}</td>
+                                </tr>
+                              </ng-container>
+          
+                            </ng-container>
+                          </tbody>
+                        </table>
+                        <ng-container *ngIf="orderItemData.decoration_settings_data.length > 0">
+                          <span class="btn btn-link btn-sm p-0" data-toggle="collapse"
+                            [attr.data-target]="'#o_item_' + orderItemData.id" 
+                            *ngIf="!decorationSettingToggle[index]" (click)="changeDecorationView(index)">View more</span>
+                          <span class="btn btn-link btn-sm p-0" data-toggle="collapse"
+                            [attr.data-target]="'#o_item_' + orderItemData.id" *ngIf="decorationSettingToggle[index]"
+                            (click)="changeDecorationView(index)">View less</span>
+                        </ng-container> -->
+                      </div>
+                    </div>
+                    
+                    <!-- Post Activity Ends -->
+                    <!-- Activity Log View Starts -->
+                    <ng-container *ngIf="isPostLoader">
+                      <ngx-content-loading
+                            [speed]="'800ms'"
+                            [width]="855"
+                            [height]="608"
+                            [primaryColor]="'#f1eff1'"
+                            [secondaryColor]="'#f8f8f8'">
+                            <svg:g ngx-rect width="100" height="40" y="5" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="5" x="150" rx="5" ry="5"></svg:g>
+            
+                            <svg:g ngx-rect width="100" height="40" y="60" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="60" x="150" rx="5" ry="5"></svg:g>
+            
+                            <svg:g ngx-rect width="100" height="40" y="120" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="120" x="150" rx="5" ry="5"></svg:g>
+            
+                            <svg:g ngx-rect width="100" height="40" y="180" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="180" x="150" rx="5" ry="5"></svg:g>
+            
+                            <svg:g ngx-rect width="100" height="40" y="240" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="240" x="150" rx="5" ry="5"></svg:g>
+            
+                            <svg:g ngx-rect width="100" height="40" y="300" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="300" x="150" rx="5" ry="5"></svg:g>
+                            
+                            <svg:g ngx-rect width="100" height="40" y="360" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="360" x="150" rx="5" ry="5"></svg:g>
+            
+                            <svg:g ngx-rect width="100" height="40" y="420" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="420" x="150" rx="5" ry="5"></svg:g>
+            
+                            <svg:g ngx-rect width="100" height="40" y="460" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="460" x="150" rx="5" ry="5"></svg:g>
+            
+                            <svg:g ngx-rect width="100" height="40" y="500" x="0" rx="5" ry="5"></svg:g>
+                            <svg:g ngx-rect width="750" height="40" y="500" x="150" rx="5" ry="5"></svg:g>
+                      </ngx-content-loading>
+                    </ng-container>
+                    <div class="track_record" *ngIf="!isPostLoader" >
+                      <div class="month_trace" *ngFor="let logMasterData of orderLogs;">
+                        <h6>{{logMasterData.month}}</h6>
+                        <ul class="dot">
+                          <li *ngFor="let logItem of logMasterData.logs; let firstIndex = index">
+                          <div class="record_date" *ngIf="logItem.log_type !== 'artwork'">
+                              <div class="date">{{logItem.created_at | dateTimeFilter:'Do MMM'}}</div>
+                              <div class="recordDetails">
+                                  <div class="top_sec" *ngIf="logItem.log_type !== 'log'">{{logItem.log_type}}</div>
+                                  <div class="middle_sec">
+                                  <div class="alert  logBox bold" [ngClass]="logItem.log_type === 'log' ? 'alert-warning text-warning-post' : ''">{{logItem.message}}<br>
+                                      <span class="text-black-50">{{logItem.created_at | dateTimeFilter:'h:mm a'}}</span>
+                                  </div>
+                                  <div class="attach" *ngIf=" logItem.files && logItem.files.length > 0">
+                                      <div *ngFor="let fileItem of logItem.files" class="img_send">
+                                      <img *ngIf="fileItem.thumbnail !== ''" [src]="fileItem.file_name" width="30px"
+                                          height="30px" />
+                                      </div>
+                                  </div>
+                                  </div>
+                              </div>
+                              </div>
+                            <div class="record_date" *ngIf="logItem.log_type === 'artwork'">
+                              <div class="date">{{logItem.created_at | dateTimeFilter:'Do MMM'}}</div>
+                              <div class="recordDetails">
+                                
+                                <div class="top_sec text-success" *ngIf="logItem.artwork_status  === 'approved'">Artwork Apporved</div>
+                                <div class="top_sec red" *ngIf=" logItem.artwork_status  === 'rejected'">Artwork Rejected</div>
+                                <div class="middle_sec">
+                                <span *ngIf="logItem.artwork_status === 'approved'">The artwork has been Approved by <u>{{orderDetailsData.customer_first_name}} {{orderDetailsData.customer_last_name}}</u>
+                                </span> 
+                                <span *ngIf="logItem.artwork_status === 'rejected'">The artwork has been Rejected by <u>{{orderDetailsData.customer_first_name}} {{orderDetailsData.customer_last_name}}</u></span>
+                                <span>{{removeHtml(logItem.message)}}</span>
+                                <div class="imgBoxWrap download"  *ngIf="logItem.files && logItem.files.length > 0">
+                                  <div class="imgBox" *ngFor="let fileItem of logItem.files">
+                                      <a href="javascript:;" (click)="downloadClickedFile(fileItem.file_name)">
+                                      <figure>
+                                          <img *ngIf="fileItem.thumbnail !== ''" [src]="fileItem.thumbnail">
+                                          <span class="imgEdit"><i class="fa fa-cloud-download"></i></span>
+                                      </figure>
+                                      </a>
+                                  </div>
+                              </div>
+                              <ng-container *ngIf="isShowRejectBox[firstIndex] && logItem.artwork_status === null && logItem.artwork_status === null ">
+                                  <div  class="mb-2" *ngIf="!toggleTextbox">
+                                      <div  class="form-group col-6 text-center mb-2 p-0">
+                                          <input  class="form-control" placeholder="Enter the reason for reject " type="text" [(ngModel)]="message">
+                                      </div>
+                                      <button  class="btn btn-success btn-sm mr-1" [disabled] = "!message" (click)="sendArtwork('reject', logItem.id,logItem.order_id)">Reject</button>
+                                      <button  class="btn btn-danger btn-sm" (click)="toggleTextbox = !toggleTextbox">Cancel</button>
+                                      
+                                  </div>
+                                  <div class="btnRow text-left mb-2" *ngIf="toggleTextbox">
+                                      <button type="button" class="btn btn-xs btn-danger mr-1" (click)="showRejctForm(firstIndex)">Reject</button>
+                                      <button type="button" class="btn btn-xs btn-success" (click)="sendArtwork('approve',logItem.id,logItem.order_id)">Approve</button>
+                                  </div>
+          
+                              </ng-container>
+                              
+                              </div>
+                              <span class="bottom_sec text-black-50">{{logItem.created_at | dateTimeFilter:'h:mm a'}}</span>
+                              </div>
+                            </div>
+                          </li>
+                        </ul>
+                      </div>
+                    </div>
+                    <!-- Activity Log View Ends -->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+</div>
+<notifier-container></notifier-container>

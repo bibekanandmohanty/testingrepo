@@ -1,0 +1,26 @@
+<div class="full-wrapper">
+    <div class="content-wrapper">
+        <div *ngIf="productionLoader" class="loader-wrapper">
+            <div class="spinner-border"></div>
+        </div>
+
+        <div *ngIf="!productionLoader" class="content-wrapper-inner">
+            <div class="job-id">Job ID: {{jobNumber}}</div>
+            <div class="job-stage">Job Stage: {{currentStageName}}</div>
+            <button *ngIf="isDisplayBtn" class="job-btn" (click)="checkForUpdateConfirmation()">
+                Mark as Done
+            </button>
+        </div>
+        <div *ngIf="(!productionLoader && updateStatus === 'success')" class="success-wrapper">
+            <div class="success-icon"></div>
+            <div class="success-text">Status updated successfully.</div>
+        </div>
+        <div *ngIf="(!productionLoader && updateStatus === 'already-updated')" class="success-wrapper">
+            <div class="success-icon"></div>
+            <div class="success-text">Status already updated.</div>
+        </div>
+        <div *ngIf="(!productionLoader && updateStatus === 'error')" class="error-wrapper">
+            Error while updating status.
+        </div>
+    </div>
+</div>

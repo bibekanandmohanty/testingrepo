@@ -1,0 +1,408 @@
+// Kanban Production
+.kanban-row {
+    .card {
+        padding: 20px;
+        border: 0;
+        border-radius: 6px !important;
+        box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.08);
+
+        .card-header {
+            padding: 0;
+            min-height: initial;
+        }
+
+        .card-body {
+            padding: 20px 0 6px 0;
+            overflow: hidden;
+            overflow-x: auto;
+
+            &::-webkit-scrollbar {
+                width: 20px;
+            }
+
+            &::-webkit-scrollbar-track {
+                background-color: rgba(0, 0, 0, 0.1);
+                border-top: 7px solid white;
+                border-bottom: 7px solid white;
+            }
+
+            &::-webkit-scrollbar-thumb {
+                background-color: #bbb;
+                border-top: 6px solid #fff;
+                border-bottom: 6px solid #fff;
+            }
+
+            &::-webkit-scrollbar-thumb:hover {
+                background-color: #999;
+            }
+        }
+    }
+}
+
+.kanban-flex {
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: space-between;
+    align-items: center;
+
+    .cardTitle {
+        .kanban-title {
+            display: flex;
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 17px;
+            margin: 0;
+
+            .plus-minus-toggle {
+                cursor: pointer;
+                position: relative;
+                height: 18px;
+                width: 18px;
+                display: inline-flex;
+                border: 1px solid #b9b9b9;
+                border-radius: 50px;
+                margin-right: 6px;
+
+                &:before,
+                &:after {
+                    content: '';
+                    width: 8px;
+                    height: 2px;
+                    background: #7d7d7d;
+                    position: absolute;
+                    top: 7px;
+                    left: 4px;
+                    transition: transform 500ms ease;
+                }
+
+                &:after {
+                    transform-origin: center;
+                }
+            }
+
+            &.collapsed {
+                .plus-minus-toggle {
+                    &:after {
+                        transform: rotate(90deg);
+                    }
+
+                    &:before {
+                        transform: rotate(180deg);
+                    }
+                }
+            }
+        }
+    }
+
+    .cardInfo {
+        display: flex;
+        flex-flow: row nowrap;
+        align-items: center;
+
+        .kanban-progress {
+            display: flex;
+            flex-flow: row nowrap;
+            align-items: center;
+
+            .progress {
+                min-width: 200px;
+                height: 10px;
+                border-radius: 50px;
+
+                .progress-bar {
+                    border-radius: 50px;
+                }
+            }
+
+            .progressvalue {
+                font-size: 14px;
+                font-weight: 500;
+                line-height: 15px;
+                padding: 0 6px;
+                position: relative;
+                top: -1px;
+            }
+        }
+
+        .badge {
+            margin-left: 30px;
+            font-weight: 400;
+            padding: 8px 12px;
+            border-radius: 50px;
+        }
+    }
+}
+
+.kanbanView-wrap {
+    display: flex;
+    flex-flow: row nowrap;
+    margin: 0 -4px;
+    border-top: 1px solid #eaeaea;
+    padding-top: 20px;
+
+    .kanbanView-list {
+        display: flex;
+        padding: 0 4px;
+
+        &.printMethod {
+            flex: auto;
+            flex-flow: column;
+        }
+
+        &.packaging,
+        &.shipping {
+            flex-flow: column;
+        }
+
+        .order-items {
+
+            &:not(:first-child) {
+                border-top: 1px solid #eaeaea;
+                padding-top: 30px;
+                margin-top: 30px;
+            }
+
+            &-title {
+                font-size: 16px;
+                line-height: 17px;
+                font-weight: 500;
+                padding-left: 12px;
+                margin: 0 0 12px 0;
+            }
+        }
+
+        .kanbanBox-title {
+            font-size: 12px;
+            line-height: 13px;
+            font-weight: 500;
+            color: #848484;
+            text-transform: capitalize;
+            margin: 0 0 4px 0;
+        }
+
+        .kanbanBox {
+            display: flex;
+            flex-flow: column;
+            justify-content: center;
+            align-items: center;
+            min-width: 150px;
+            width: 100%;
+            min-height: 120px;
+            height: 100%;
+            background-color: #fafafa;
+            border: 1px dashed rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            position: relative;
+
+            &::before {
+                content: 'Create a card';
+                position: absolute;
+                color: #adadad;
+            }
+
+            .success-text {
+                display: none;
+                font-size: 14px;
+                line-height: 15px;
+                font-weight: 400;
+                color: #444444;
+                text-transform: capitalize;
+                margin-top: 0;
+            }
+
+            .success-icon {
+                display: none;
+                width: 30px;
+                height: 30px;
+                position: relative;
+                margin: 0;
+
+                &::before {
+                    content: '';
+                    display: block;
+                    width: 34px;
+                    height: 34px;
+                    background-color: #18c770;
+                    border-radius: 100px;
+                }
+
+                &::after {
+                    content: '';
+                    display: block;
+                    transform: rotate(45deg);
+                    height: 17px;
+                    width: 7px;
+                    border-bottom: 2px solid #ffffff;
+                    border-right: 2px solid #ffffff;
+                    position: absolute;
+                    top: 7px;
+                    left: 14px;
+                }
+            }
+
+            .jobBox {
+                display: none;
+                flex-flow: column;
+                min-width: 230px;
+                min-height: calc(100% - 12px);
+                background-color: #fff;
+                border-radius: 5px;
+                box-shadow: 0px 1px 4px 0px rgba(0, 0, 0, 0.08);
+                margin: 6px;
+                padding: 10px;
+
+                &-info {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    .ordId {
+                        background: #d8e5ff;
+                        text-transform: uppercase;
+                        font-size: 11px;
+                        font-weight: 500;
+                        line-height: 11px;
+                        padding: 4px 10px;
+                        border-radius: 50px;
+                    }
+
+                    .ordQty {
+                        font-size: 12px;
+                        line-height: 13px;
+
+                        strong {
+                            font-size: 14px;
+                        }
+                    }
+                }
+
+                &-title {
+                    font-size: 15px;
+                    font-weight: 500;
+                    line-height: 17px;
+                    margin: 12px 0 18px;
+                }
+
+                &-meta {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+
+                    .profile {
+                        figure {
+                            margin: 0;
+                            width: 24px;
+                            height: 24px;
+                            border-radius: 50px;
+                            overflow: hidden;
+
+                            img {
+                                max-width: 100%;
+                            }
+                        }
+                    }
+
+                    .date {
+                        border: 1px solid #ffd9d9;
+                        padding: 3px 10px;
+                        font-size: 12px;
+                        font-weight: 500;
+                        border-radius: 3px;
+                        color: #FF5722;
+
+                        .pg {
+                            font-size: 10px;
+                            line-height: 10px;
+                            top: 0.3px;
+                        }
+                    }
+                }
+            }
+
+            &.title {
+                flex-flow: column-reverse;
+                align-items: flex-start;
+                justify-content: flex-end;
+                background-color: transparent;
+                padding-left: 12px;
+                border: 0;
+
+                &::before {
+                    display: none;
+                }
+
+                .subTitle {
+                    font-size: 12px;
+                    line-height: 13px;
+                    color: #999;
+                    margin-top: 3px;
+                }
+
+                .mainTitle {
+                    font-size: 14px;
+                    line-height: 15px;
+                    font-weight: 600;
+                    font-weight: 600;
+                    color: #333;
+                }
+            }
+        }
+
+        .printMethod-flex {
+            display: flex;
+            flex-flow: column nowrap;
+            margin: -4px 0;
+            width: 100%;
+
+            .printMethod-list {
+                display: flex;
+                flex-flow: row nowrap;
+                padding: 10px 0;
+                margin: 0 -4px;
+
+                &:last-child {
+                    padding-bottom: 4px;
+                }
+
+                .printMethod-items {
+                    flex: auto;
+                    display: flex;
+                    flex-flow: column;
+                    padding: 0 4px;
+
+                    &.titleWrap {
+                        flex: 1;
+                        max-width: 150px;
+                    }
+
+                    &.completed {
+                        .kanbanBox {
+                            &::before {
+                                display: none;
+                            }
+
+                            .success-text,
+                            .success-icon {
+                                display: block;
+                            }
+                        }
+                    }
+
+                    &.working {
+                        .kanbanBox {
+                            background-color: #c8defb;
+
+                            &::before {
+                                display: none;
+                            }
+
+                            .jobBox {
+                                display: flex;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

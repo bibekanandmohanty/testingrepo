@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 635 480" xmlns="http://www.w3.org/2000/svg">
+<g transform="translate(-841 -129)" fill="#495057" data-name="Group 3">
+<rect transform="translate(1023 129)" width="20" height="480" data-name="Rectangle 7"/>
+<rect transform="translate(841 129)" width="20" height="101" opacity="0" data-name="Rectangle 14"/>
+<rect transform="translate(841 508)" width="20" height="101" opacity="0" data-name="Rectangle 17"/>
+<rect transform="translate(1456 508)" width="20" height="101" opacity="0" data-name="Rectangle 19"/>
+<rect transform="translate(1455 129)" width="20" height="101" opacity="0" data-name="Rectangle 15"/>
+<rect transform="translate(1401 230) rotate(90)" width="20" height="480" data-name="Rectangle 8"/>
+<rect transform="translate(943 129) rotate(90)" width="20" height="102" opacity="0" data-name="Rectangle 13"/>
+<rect transform="translate(841 609) rotate(-90)" width="20" height="102" opacity="0" data-name="Rectangle 18"/>
+<rect transform="translate(1374 609) rotate(-90)" width="20" height="102" opacity="0" data-name="Rectangle 20"/>
+<rect transform="translate(1475 129) rotate(90)" width="20" height="102" opacity="0" data-name="Rectangle 16"/>
+<rect transform="translate(1401 358) rotate(90)" width="20" height="480" data-name="Rectangle 10"/>
+<rect transform="translate(1401 486) rotate(90)" width="20" height="480" data-name="Rectangle 12"/>
+<rect transform="translate(1152 129)" width="20" height="480" data-name="Rectangle 9"/>
+<rect transform="translate(1279 129)" width="20" height="480" data-name="Rectangle 11"/>
+</g>
+</svg>

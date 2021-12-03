@@ -141,4 +141,5 @@ $s3->deleteBucket(['Bucket' => $bucket]);
  http://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/basic-usage.html#synchronous-error-handling
  http://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/basic-usage.html#synchronous-error-handling
  http://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/basic-usage.html#synchronous-error-handling
+ http://docs.aws.amazon.com/aws-sdk-php/v3/guide/getting-started/basic-usage.html#synchronous-error-handling
 */
